@@ -322,6 +322,17 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""464ba3c8-83ca-43a4-8f9b-f901d1b06889"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Dive"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""52eeda99-777c-4a2e-b9e2-231a2d390bf9"",
                     ""path"": ""<Gamepad>/buttonWest"",
                     ""interactions"": """",
