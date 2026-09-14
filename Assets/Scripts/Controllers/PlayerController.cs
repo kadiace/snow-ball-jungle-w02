@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
     private float _jumpGroundedCheckLockTimer;
     private float _coyoteTimer;
     private bool _diveInput;
-    private bool _canJump = true;
+    private bool _canJump;
 
     private float _currentSizeRatio;
 
