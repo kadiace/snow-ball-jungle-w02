@@ -19,36 +19,24 @@ public class PlayerCameraController : MonoBehaviour
     {
         _player = GameObject.Find("Player").transform;
         _playerController = _player.gameObject.GetComponent<PlayerController>();
-        _pitch = 30f;
-        _yaw = 130f;
+        // _pitch = 30f;
+        // _yaw = 130f;
     }
 
     private void Update()
     {
-        if (_playerController.GetCutSceneState()) return;
-
         Vector2 lookInput =
-            GameInputController.Instance.LookInput;
+        GameInputController.Instance.LookInput;
 
         if (GameInputController.Instance.GamePadConnected)
         {
-            _yaw +=
-                lookInput.x *
-                _gamepadSensitivity;
-
-            _pitch -=
-                lookInput.y *
-                _gamepadSensitivity;
+            _yaw += lookInput.x * _gamepadSensitivity * Time.deltaTime;
+            _pitch -= lookInput.y * _gamepadSensitivity * Time.deltaTime;
         }
         else
         {
-            _yaw +=
-                lookInput.x *
-                _mouseSensitivity;
-
-            _pitch -=
-                lookInput.y *
-                _mouseSensitivity;
+            _yaw += lookInput.x * _mouseSensitivity;
+            _pitch -= lookInput.y * _mouseSensitivity;
         }
 
         _pitch =
@@ -57,19 +45,15 @@ public class PlayerCameraController : MonoBehaviour
                 _minPitch,
                 _maxPitch
             );
-
-        transform.rotation =
-            Quaternion.Euler(
-                _pitch,
-                _yaw,
-                0f
-            );
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
         transform.position =
             _player.position +
             Vector3.up * _height;
+
+        transform.rotation =
+            Quaternion.Euler(_pitch, _yaw, 0f);
     }
 }
