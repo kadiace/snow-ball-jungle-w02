@@ -7,6 +7,7 @@ public class CutsceneController : MonoBehaviour
 {
     [SerializeField] private GameObject[] _cineCams;
     [SerializeField] private SphereFriend[] friends;
+    [SerializeField] private GameObject _savePoint;
     private PlayerController _player;
     private bool _cutsceneStarted = false;
     private bool _timerOn = false;
@@ -20,6 +21,7 @@ public class CutsceneController : MonoBehaviour
     private GameObject _endingUIObject;
     private InputAction _confirmAction;
 
+
     void Awake()
     {
         _endingUIPrefab = Resources.Load<GameObject>("Prefabs/UIs/EndingCanvas");
@@ -29,7 +31,7 @@ public class CutsceneController : MonoBehaviour
         _confirmAction = InputSystem.actions.FindAction("Confirm");
         _confirmAction.performed += OnJumpPerformed;
         _endingUIObject.SetActive(false);
-
+        _savePoint.SetActive(false);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -85,6 +87,7 @@ public class CutsceneController : MonoBehaviour
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             _endingUIObject.SetActive(true);
+            _savePoint.SetActive(true);
         }
     }
 
