@@ -23,8 +23,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 100f)] private float _diveAcceleration = 20f;
 
     [Header("Boundary")]
-    [SerializeField] private Vector3 _boundaryCenter = new Vector3(-600f, 0f, 0f);
-    [SerializeField] private float _boundaryRadius = 1200f;
+    [SerializeField] private Vector3 _boundaryCenter = new Vector3(0f, 0f, 0f);
+    [SerializeField] private float _boundaryRadius = 2500f;
     [SerializeField] private float _freeAngle = 10f;
 
     [Header("Jump")]
@@ -57,12 +57,6 @@ public class PlayerController : MonoBehaviour
     private Vector3 _groundNormal = Vector3.up;
     private bool _hasGroundContact;
     private Vector3 _contactGroundNormal = Vector3.up;
-    private Vector3 _lastValidPosition;
-    private Vector3 _registeredSavePos;
-
-    public SaveObject registeredSaveObject;
-    private bool cutsceneStarted = false;
-    public Action OnRegistered;
 
     public bool IsGrounded { get; private set; }
     public float CurrentSizeRatio => _currentSizeRatio;
@@ -94,30 +88,23 @@ public class PlayerController : MonoBehaviour
         _jumpPanelController.SetMaxJumps(_maxJumpCount);
         SetCurrentJumpCount(_maxJumpCount);
 
-        _registeredSavePos = transform.position;
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     private void Update()
     {
-        if (cutsceneStarted) return;
-
         ProcessMoveInput();
         ProcessResizeInput();
         ProcessJumpInput();
         ProcessDiveInput();
-        ProcessRestartInput();
     }
 
     private void FixedUpdate()
     {
         CheckGround();
-        if (cutsceneStarted) return;
 
         ProcessResize();
-
         ProcessJump();
         ApplyMovement();
         ClampGravityVelocity();
@@ -156,18 +143,6 @@ public class PlayerController : MonoBehaviour
     private void ProcessDiveInput()
     {
         _diveInput = GameInputController.Instance.DiveInput;
-    }
-
-    private void ProcessRestartInput()
-    {
-        if (!GameInputController.Instance.RestartPressed)
-            return;
-
-        _rb.position = _registeredSavePos + new Vector3(0f, ((transform.localScale.y - registeredSaveObject.transform.localScale.y) / 2f), 0f);
-
-        _rb.linearVelocity = Vector3.zero;
-        _rb.angularVelocity = Vector3.zero;
-
     }
 
     private void ProcessResize()
@@ -466,73 +441,10 @@ public class PlayerController : MonoBehaviour
 
     private void RestrictPosition()
     {
-        Vector3 previousOffset = _lastValidPosition - _boundaryCenter;
-        Vector3 currentOffset = _rb.position - _boundaryCenter;
-
-        previousOffset.y = 0f;
-        currentOffset.y = 0f;
-
-        float previousDistance = previousOffset.magnitude;
-        float currentDistance = currentOffset.magnitude;
-
-        float previousAngle = Vector3.SignedAngle(
-            Vector3.back,
-            previousOffset,
-            Vector3.up
-        );
-
-        float currentAngle = Vector3.SignedAngle(
-            Vector3.back,
-            currentOffset,
-            Vector3.up
-        );
-
-        bool isInsideCircle =
-            currentDistance <= _boundaryRadius;
-
-        bool isInsidePassage =
-            Mathf.Abs(currentAngle) <= _freeAngle;
-
-        if (isInsideCircle || isInsidePassage)
-        {
-            _lastValidPosition = _rb.position;
-            return;
-        }
-
-        float angleTolerance = 0.01f;
-        if (
-            previousDistance > _boundaryRadius &&
-            Mathf.Abs(previousAngle) <= _freeAngle + angleTolerance)
-        {
-            float boundaryAngle =
-                currentAngle > 0f
-                    ? _freeAngle - angleTolerance
-                    : -_freeAngle + angleTolerance;
-
-            Vector3 direction =
-                Quaternion.AngleAxis(
-                    boundaryAngle,
-                    Vector3.up
-                ) * Vector3.back;
-
-            _rb.position = new Vector3(
-                _boundaryCenter.x + direction.x * currentDistance,
-                _rb.position.y,
-                _boundaryCenter.z + direction.z * currentDistance
-            );
-        }
-        else
-        {
-            Vector3 direction = currentOffset.normalized;
-
-            _rb.position = new Vector3(
-                _boundaryCenter.x + direction.x * _boundaryRadius,
-                _rb.position.y,
-                _boundaryCenter.z + direction.z * _boundaryRadius
-            );
-        }
-
-        _lastValidPosition = _rb.position;
+        Vector3 position = _rb.position;
+        position.x = MathF.Min(_rb.position.x, _boundaryRadius);
+        position.z = MathF.Min(_rb.position.z, _boundaryRadius);
+        _rb.position = position;
     }
 
     private IEnumerator ApplyCoyoteTime()
@@ -577,62 +489,9 @@ public class PlayerController : MonoBehaviour
         _contactGroundNormal = bestGroundNormal;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-
-        //else if (other.CompareTag("PrizeFirst"))
-        //{
-        //    _canJump = true;
-        //    Managers.Game.MoveToNextState();
-        //}
-        if (other.CompareTag("Save"))
-        {
-            _registeredSavePos = other.transform.position;
-            registeredSaveObject = other.GetComponent<SaveObject>();
-            OnRegistered?.Invoke();
-        }
-
-    }
-    public void AcquireFirstPrize()
-    {
-        _canJump = true;
-        Managers.Game.MoveToNextState();
-    }
-    public void AcquirePrize()
-    {
-        SetMaxJumpCount(_maxJumpCount + 1);
-    }
-
     private void SetCurrentJumpCount(int currentJumpCount)
     {
         _jumpPanelController.SetCurrentJumps(currentJumpCount);
         _currentJumpCount = currentJumpCount;
-    }
-
-    private void SetMaxJumpCount(int maxJumpCount)
-    {
-        _jumpPanelController.SetMaxJumps(maxJumpCount);
-        _maxJumpCount = maxJumpCount;
-    }
-
-    public void SetCutSceneState(bool state)
-    {
-        cutsceneStarted = state;
-    }
-
-    public bool GetCutSceneState()
-    {
-        return cutsceneStarted;
-    }
-
-    public void SetLinearVelocity(Vector3 moveVec)
-    {
-        _rb.linearVelocity = moveVec;
-        if (moveVec == Vector3.zero)
-        {
-            _rb.angularVelocity = moveVec;
-
-        }
-
     }
 }
