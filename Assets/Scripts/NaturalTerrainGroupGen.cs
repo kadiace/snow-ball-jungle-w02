@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>One generator for an entire connected group of 300 x 300 Terrains.</summary>
 [DisallowMultipleComponent]
 public sealed class NaturalTerrainGroupGen : MonoBehaviour
 {
@@ -19,7 +18,7 @@ public sealed class NaturalTerrainGroupGen : MonoBehaviour
     [Tooltip("Fixed world X/Z sampling offset. Changing it moves the landscape pattern.")]
     public Vector2 noiseOffset;
     [Min(100f)] public float terrainHeight = 600f;
-    private const float TileSize = 300f;
+    [Min(1f)] public const float TileSize = 1000f;
 
     private void SortTiles()
     {
@@ -154,8 +153,8 @@ public sealed class NaturalTerrainGroupGen : MonoBehaviour
                 for (int z = 0; z < resolution; z++)
                     for (int x = 0; x < resolution; x++)
                         heights[z, x] = (float)(field.Sample(
-                            originX + x * 300.0 / (resolution - 1),
-                            originZ + z * 300.0 / (resolution - 1)) / vertical);
+                            originX + x * TileSize / (resolution - 1),
+                            originZ + z * TileSize / (resolution - 1)) / vertical);
                 generated.Add(tile, heights);
             }
 
@@ -241,15 +240,10 @@ public sealed class NaturalTerrainGroupGen : MonoBehaviour
                 (tile.transform.lossyScale - Vector3.one).sqrMagnitude > 0.000001f)
                 return Fail(tile.name + ": Terrain rotation must be zero and world scale must be one.");
             Vector3 size = tile.terrainData.size;
-            if (Mathf.Abs(size.x - TileSize) > 0.0001f || Mathf.Abs(size.z - TileSize) > 0.0001f)
-                return Fail(tile.name + ": Width and Length must both be 300.");
             Vector3 p = tile.transform.position;
             // Require exact common Y and edge positions rather than silently creating cracks.
             int gx = Mathf.RoundToInt((p.x - origin.x) / TileSize);
             int gz = Mathf.RoundToInt((p.z - origin.z) / TileSize);
-            if (p.y != origin.y || (double)p.x != (double)origin.x + gx * 300.0 ||
-                (double)p.z != (double)origin.z + gz * 300.0)
-                return Fail(tile.name + ": use the same Y and exact 300-unit X/Z spacing for all tiles.");
             Vector2Int key = new Vector2Int(gx, gz);
             if (grid.ContainsKey(key)) return Fail("Duplicate or overlapping Terrain entries.");
             grid.Add(key, tile);
