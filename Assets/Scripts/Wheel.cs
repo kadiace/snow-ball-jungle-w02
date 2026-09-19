@@ -29,7 +29,6 @@ public class Wheel : MonoBehaviour
     {
         float currentYAngle = transform.eulerAngles.y;
         float deltaAngle = Mathf.Abs(Mathf.DeltaAngle(_prevYAngle, currentYAngle));
-        Debug.Log(deltaAngle);
 
         if (deltaAngle > 0.05f)
         {
