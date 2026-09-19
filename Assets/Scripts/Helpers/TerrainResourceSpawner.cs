@@ -103,21 +103,31 @@ public class TerrainResourceSpawner : MonoBehaviour
 
             spawnPosition.y += _heightOffset;
 
-            GameObject instance = Instantiate(
-                prefab,
-                spawnPosition,
-                Quaternion.identity,
-                parent);
+#if UNITY_EDITOR
+            GameObject instance;
 
+            if (!Application.isPlaying)
+            {
+                instance = (GameObject)UnityEditor.PrefabUtility
+                    .InstantiatePrefab(prefab, parent);
+            }
+            else
+            {
+                instance = Instantiate(prefab, parent);
+            }
+#else
+            GameObject instance = Instantiate(prefab, parent);
+#endif
+
+            instance.transform.position = spawnPosition;
             instance.name = prefab.name;
 
             if (_randomRotation)
             {
-                instance.transform.rotation =
-                    Quaternion.Euler(
-                        0f,
-                        Random.Range(0f, 360f),
-                        0f);
+                instance.transform.rotation = Quaternion.Euler(
+                    0f,
+                    Random.Range(0f, 360f),
+                    0f);
             }
         }
     }
