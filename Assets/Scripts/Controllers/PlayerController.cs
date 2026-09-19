@@ -12,20 +12,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField, Range(0f, 90f)] private float _maxGroundAngle = 50f;
 
     [Header("Ball Stat")]
-    [SerializeField] private BallStat _smallBall;
-    [SerializeField] private BallStat _largeBall;
-
-    [Header("Resize")]
-    [SerializeField] private float _resizeSpeed = 1f;
-    [SerializeField] private float _shrinkUpwardVelocityBoost = 10f;
-
-    [Header("Gravity")]
-    [SerializeField, Range(0f, 100f)] private float _diveAcceleration = 20f;
+    [SerializeField] private BallStat _ballStat;
 
     [Header("Boundary")]
-    [SerializeField] private Vector3 _boundaryCenter = new Vector3(0f, 0f, 0f);
     [SerializeField] private float _boundaryRadius = 2500f;
-    [SerializeField] private float _freeAngle = 10f;
 
     [Header("Jump")]
     [SerializeField] private float _coyoteTime = 0.1f;
@@ -40,18 +30,12 @@ public class PlayerController : MonoBehaviour
     private PhysicsMaterial _physicsMaterial;
     private Transform _cameraTransform;
     private HapticManager _hapticManager;
-    private Text _velocityText;
-    private Text _heightText;
     private JumpPanelController _jumpPanelController;
 
     private Vector2 _moveInput;
-    private float _resizeInput;
     private float _jumpBufferTimer;
     private float _jumpGroundedCheckLockTimer;
     private float _coyoteTimer;
-    private bool _diveInput;
-
-    private float _currentSizeRatio;
 
     private Vector3 _gravityDir = Vector3.down;
     private Vector3 _groundNormal = Vector3.up;
@@ -59,17 +43,11 @@ public class PlayerController : MonoBehaviour
     private Vector3 _contactGroundNormal = Vector3.up;
 
     public bool IsGrounded { get; private set; }
-    public float CurrentSizeRatio => _currentSizeRatio;
     public float MaxJumpCount => _maxJumpCount;
-    public BallStat SmallBall => _smallBall;
-    public BallStat LargeBall => _largeBall;
+    public BallStat BallStat => _ballStat;
 
     private void Awake()
     {
-        GameObject debugCanvas = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/DebugCanvas"));
-        _velocityText = debugCanvas.transform.Find("VelocityText").GetComponent<Text>();
-        _heightText = debugCanvas.transform.Find("HeightText").GetComponent<Text>();
-
         GameObject jumpCountCanvas = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/JumpCountCanvas"));
         _jumpPanelController = jumpCountCanvas.GetComponent<JumpPanelController>();
 
@@ -82,7 +60,6 @@ public class PlayerController : MonoBehaviour
 
         _cameraTransform = Camera.main.transform;
 
-        _currentSizeRatio = Mathf.Clamp01(_smallBall.SizeRatio);
         ApplyCurrentSizeStat();
 
         _jumpPanelController.SetMaxJumps(_maxJumpCount);
@@ -95,26 +72,18 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         ProcessMoveInput();
-        ProcessResizeInput();
         ProcessJumpInput();
-        ProcessDiveInput();
     }
 
     private void FixedUpdate()
     {
         CheckGround();
 
-        ProcessResize();
         ProcessJump();
         ApplyMovement();
         ClampGravityVelocity();
 
         RestrictPosition();
-
-        _velocityText.text = $"{_rb.linearVelocity.magnitude:F2} m/s";
-        _heightText.text = $"{transform.position.y:F2} m";
-
-        // Debug.Log($"IsGrounded: {IsGrounded}, GroundNormal: {_groundNormal}");
     }
 
     private void OnDisable()
@@ -127,11 +96,6 @@ public class PlayerController : MonoBehaviour
         _moveInput = GameInputController.Instance.MoveInput;
     }
 
-    private void ProcessResizeInput()
-    {
-        _resizeInput = Mathf.Clamp(GameInputController.Instance.ResizeInput, -1f, 1f);
-    }
-
     private void ProcessJumpInput()
     {
         if (GameInputController.Instance.JumpPressed)
@@ -140,102 +104,11 @@ public class PlayerController : MonoBehaviour
             _jumpBufferTimer = Mathf.Max(0f, _jumpBufferTimer - Time.deltaTime);
     }
 
-    private void ProcessDiveInput()
-    {
-        _diveInput = GameInputController.Instance.DiveInput;
-    }
-
-    private void ProcessResize()
-    {
-        float curvedInput = GetEaseOutSineInput(_resizeInput);
-
-        if (Mathf.Abs(curvedInput) <= Mathf.Epsilon)
-        {
-            _hapticManager.StopHaptic();
-            return;
-        }
-
-        float previousRatio = _currentSizeRatio;
-        float nextRatio = Mathf.Clamp01(previousRatio + curvedInput * _resizeSpeed * Time.fixedDeltaTime);
-
-        if (Mathf.Approximately(previousRatio, nextRatio))
-        {
-            _hapticManager.StopHaptic();
-            return;
-        }
-
-        float previousMass = GetStat(previousRatio, stat => stat.Mass);
-        Vector3 previousVelocity = _rb.linearVelocity;
-        float previousRadius = _collider.radius * transform.lossyScale.x;
-
-        _currentSizeRatio = nextRatio;
-        ApplyCurrentSizeStat();
-
-        float currentRadius = _collider.radius * transform.lossyScale.x;
-        float radiusDelta = currentRadius - previousRadius;
-        float currentMass = GetStat(_currentSizeRatio, stat => stat.Mass);
-
-        _rb.linearVelocity = previousVelocity * Mathf.Sqrt(previousMass / currentMass);
-
-        if (_currentSizeRatio > previousRatio)
-        {
-            _rb.position += -_gravityDir * radiusDelta * 2f;
-
-            float downwardSpeed = Vector3.Dot(_rb.linearVelocity, _gravityDir);
-
-            if (downwardSpeed > 0f)
-                _rb.linearVelocity -= _gravityDir * downwardSpeed;
-
-            Vector3 horizontalVelocity =
-                new Vector3(_rb.linearVelocity.x, 0f, _rb.linearVelocity.z);
-
-            if (horizontalVelocity.sqrMagnitude > 0.001f)
-            {
-                float scale = GetStat(_currentSizeRatio, stat => stat.Scale);
-                float angularSpeed =
-                    horizontalVelocity.magnitude / (scale / 2f);
-
-                Vector3 rotationAxis =
-                    Vector3.Cross(
-                        Vector3.up,
-                        horizontalVelocity.normalized
-                    );
-
-                _rb.angularVelocity =
-                    rotationAxis * angularSpeed;
-            }
-        }
-        else if (IsGrounded)
-            _rb.position += _groundNormal * radiusDelta;
-
-
-
-        float hapticIntensity = Mathf.Lerp(0.05f, 0.1f, _currentSizeRatio);
-        _hapticManager.HapticControl(hapticIntensity);
-    }
-
-    private float GetEaseOutSineInput(float input)
-    {
-        float magnitude = Mathf.Abs(input);
-        float curvedMagnitude = Mathf.Sin(magnitude * Mathf.PI * 0.5f);
-
-        return Mathf.Sign(input) * curvedMagnitude;
-    }
-
-    private float GetStat(float ratio, Func<BallStat, float> selector)
-    {
-        return Mathf.Lerp(selector(_smallBall), selector(_largeBall), ratio);
-    }
-
     private void ApplyCurrentSizeStat()
     {
-        float scale = GetStat(_currentSizeRatio, stat => stat.Scale);
-        float mass = GetStat(_currentSizeRatio, stat => stat.Mass);
-        float bounciness = GetStat(_currentSizeRatio, stat => stat.Bounciness);
-
-        transform.localScale = Vector3.one * scale;
-        _rb.mass = mass;
-        _physicsMaterial.bounciness = bounciness;
+        transform.localScale = Vector3.one * Managers.Game.ResourcesData.Scale;
+        _rb.mass = Managers.Game.ResourcesData.Mass;
+        _physicsMaterial.bounciness = _ballStat.Bounciness;
     }
 
     private void CheckGround()
@@ -304,7 +177,7 @@ public class PlayerController : MonoBehaviour
 
         bool groundJump = IsGrounded || canCoyote;
 
-        float jumpForce = GetStat(_currentSizeRatio, stat => stat.JumpForce);
+        float jumpForce = _ballStat.JumpForce;
 
         if (groundJump)
         {
@@ -371,8 +244,8 @@ public class PlayerController : MonoBehaviour
         if (inputMagnitude <= 0.001f)
             return;
 
-        float moveSpeed = GetStat(_currentSizeRatio, stat => stat.MoveSpeed);
-        float moveResponseTime = GetStat(_currentSizeRatio, stat => stat.MoveResponseTime);
+        float moveSpeed = _ballStat.MoveSpeed;
+        float moveResponseTime = _ballStat.MoveResponseTime;
 
         Vector3 targetVelocity = groundMoveDirection * moveSpeed * inputMagnitude;
         Vector3 currentVelocity = Vector3.ProjectOnPlane(_rb.linearVelocity, _groundNormal);
@@ -388,19 +261,13 @@ public class PlayerController : MonoBehaviour
 
     private void AirMove(Vector3 worldMoveInput)
     {
-        UpdateAirMoveVelocity(worldMoveInput);
-        ApplyDiveGravity();
-    }
-
-    private void UpdateAirMoveVelocity(Vector3 worldMoveInput)
-    {
         float inputMagnitude = Mathf.Clamp01(worldMoveInput.magnitude);
 
         if (inputMagnitude <= 0.001f)
             return;
 
-        float moveSpeed = GetStat(_currentSizeRatio, stat => stat.MoveSpeed);
-        float moveAcceleration = GetStat(_currentSizeRatio, stat => stat.MoveAcceleration);
+        float moveSpeed = _ballStat.MoveSpeed;
+        float moveAcceleration = _ballStat.MoveAcceleration;
 
         Vector3 moveDirection = worldMoveInput.normalized;
         float targetSpeed = moveSpeed * inputMagnitude;
@@ -419,17 +286,9 @@ public class PlayerController : MonoBehaviour
         _rb.AddForce(moveDirection * acceleration, ForceMode.Acceleration);
     }
 
-    private void ApplyDiveGravity()
-    {
-        if (!_diveInput)
-            return;
-
-        _rb.AddForce(_gravityDir * _diveAcceleration, ForceMode.Acceleration);
-    }
-
     private void ClampGravityVelocity()
     {
-        float maxGravityVelocity = GetStat(_currentSizeRatio, stat => stat.MaxGravityVelocity);
+        float maxGravityVelocity = _ballStat.MaxGravityVelocity;
         float gravitySpeed = Vector3.Dot(_rb.linearVelocity, _gravityDir);
 
         if (gravitySpeed <= maxGravityVelocity)
@@ -445,13 +304,6 @@ public class PlayerController : MonoBehaviour
         position.x = MathF.Min(_rb.position.x, _boundaryRadius);
         position.z = MathF.Min(_rb.position.z, _boundaryRadius);
         _rb.position = position;
-    }
-
-    private IEnumerator ApplyCoyoteTime()
-    {
-        yield return new WaitForSeconds(_coyoteTime);
-        IsGrounded = false;
-        _groundNormal = -_gravityDir;
     }
 
     private void OnCollisionEnter(Collision collision)

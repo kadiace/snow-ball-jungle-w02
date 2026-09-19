@@ -8,7 +8,8 @@ public class ResourcesData
     public bool IsActive;
     public float CurrentEnergy;
     public float MaxEnergy;
-    public float Size;
+    public float Scale;
+    public float Mass;
 }
 
 public class GameManager
@@ -77,7 +78,8 @@ public class GameManager
             IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,
-            Size = 6
+            Scale = 6,
+            Mass = 3,
         };
         _elapsedTime = 0f;
     }
@@ -91,7 +93,8 @@ public class GameManager
             IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,
-            Size = 6
+            Scale = 6,
+            Mass = 3
         };
         _elapsedTime = 0f;
     }

@@ -84,7 +84,7 @@ public class SpeedCameraEffect : MonoBehaviour
                 speedRatio
             );
 
-        //Ä«¸Þ¶ó º¸´Â ¹æÇâ°ú ÇÃ·¹ÀÌ¾îÀÇ ÀÌµ¿ ¹æÇâÀÌ ¹Ý´ëÀÎ °æ¿ì z´ïÇÎ ¾ø¾Ö±â
+        //Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ý´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ zï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö±ï¿½
         if (Vector3.Dot(_mainCamTransform.forward, _playerRb.linearVelocity) <= 0)
         {
             targetDamping.z = 0;
@@ -105,10 +105,8 @@ public class SpeedCameraEffect : MonoBehaviour
 
         float targetDistance =
             Mathf.Lerp(
-                _playerController.SmallBall.SlowCameraDistance,
-                _playerController.SmallBall.FastCameraDistance,
-                //_playerController.OwnedBalls[_playerController.CurrentBallNum].SlowCameraDistance,
-                //_playerController.OwnedBalls[_playerController.CurrentBallNum].FastCameraDistance,
+                _playerController.BallStat.SlowCameraDistance,
+                _playerController.BallStat.FastCameraDistance,
                 speedRatio
             );
 

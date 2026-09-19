@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2b9ffa42686e6f54bb234d0519f095f7, type: 3}
-  m_Name: BallSizeS
+  m_Name: BallStat
   m_EditorClassIdentifier: Assembly-CSharp::BallStat
   _moveSpeed: 60
   _moveAcceleration: 27
   _moveResponseTime: 0.5
-  _jumpForce: 40
-  _maxGravityVelocity: 60
-  _mass: 1
+  _jumpForce: 80
+  _maxGravityVelocity: 200
+  _mass: 3
   _bounciness: 0.15
   _scale: 6
   _slowCameraDistance: 25
