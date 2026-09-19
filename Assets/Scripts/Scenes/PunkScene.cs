@@ -112,6 +112,6 @@ public class PunkScene : MonoBehaviour
         };
 
         _timeText.text = $"{Managers.Game.CurrentTime}";
-        _sizeText.text = $"눈덩이 무게: {Managers.Game.ResourcesData.Mass}";
+        _sizeText.text = $"눈덩이 무게: {Managers.Game.ResourcesData.Mass:F2}";
     }
 }

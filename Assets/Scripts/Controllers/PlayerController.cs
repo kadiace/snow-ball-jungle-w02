@@ -378,9 +378,10 @@ public class PlayerController : MonoBehaviour
             time += Time.deltaTime;
             float t = Mathf.Clamp01(time);
 
-            _rb.mass = Mathf.Lerp(startMass, targetMass, t);
-            transform.localScale = Vector3.one *
-                Mathf.Lerp(startScale, targetScale, t);
+            Managers.Game.ResourcesData.Mass = Mathf.Lerp(startMass, targetMass, t);
+            Managers.Game.ResourcesData.Scale = Mathf.Lerp(startScale, targetScale, t);
+            _rb.mass = Managers.Game.ResourcesData.Mass;
+            transform.localScale = Vector3.one * Managers.Game.ResourcesData.Scale;
 
             yield return null;
         }
