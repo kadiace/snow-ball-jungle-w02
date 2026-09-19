@@ -17,9 +17,7 @@ MonoBehaviour:
   _moveResponseTime: 0.5
   _jumpForce: 80
   _maxGravityVelocity: 200
-  _mass: 3
   _bounciness: 0.15
-  _scale: 6
-  _slowCameraDistance: 25
-  _fastCameraDistance: 28
+  _slowCameraDistance: 80
+  _fastCameraDistance: 88
   _sizeRatio: 0

@@ -95,7 +95,7 @@ public class PunkScene : MonoBehaviour
         _nextDegreeText.text = $"{Managers.Game.NextDegree} °C";
 
         _treeText.text = $"나무: {Managers.Game.ResourcesData.Tree}";
-        _ironText.text = $"철: {Managers.Game.ResourcesData.Iron}";
+        _ironText.text = $"철: {Managers.Game.ResourcesData.Metal}";
 
         _consumeText.text = $"{Mathf.Abs(Managers.Game.EnergyDelta)}";
         _consumeSignText.text = Managers.Game.EnergyDelta switch

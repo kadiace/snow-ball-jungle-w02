@@ -9,6 +9,8 @@ TagManager:
   - PrizeFirst
   - CursceneStartZone
   - Save
+  - Tree
+  - Metal
   layers:
   - Default
   - TransparentFX

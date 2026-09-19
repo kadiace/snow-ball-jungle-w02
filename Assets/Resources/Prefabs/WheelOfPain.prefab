@@ -156,8 +156,8 @@ FixedJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  m_MassScale: 0.1
+  m_ConnectedMassScale: 0.1
 --- !u!114 &5547517347468872388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,8 +326,8 @@ FixedJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  m_MassScale: 0.1
+  m_ConnectedMassScale: 0.1
 --- !u!114 &5968035472807492880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,8 +496,8 @@ FixedJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  m_MassScale: 0.1
+  m_ConnectedMassScale: 0.1
 --- !u!114 &1469329374004357072
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,8 +917,8 @@ FixedJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  m_MassScale: 0.1
+  m_ConnectedMassScale: 0.1
 --- !u!114 &376474458466683862
 MonoBehaviour:
   m_ObjectHideFlags: 0

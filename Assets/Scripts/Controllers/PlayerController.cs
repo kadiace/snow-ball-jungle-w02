@@ -42,6 +42,11 @@ public class PlayerController : MonoBehaviour
     private bool _hasGroundContact;
     private Vector3 _contactGroundNormal = Vector3.up;
 
+    private Coroutine _sizeChangeCoroutine;
+    private float _massChange;
+    private float _scaleChange;
+    private float _maxScale = 20f;
+
     public bool IsGrounded { get; private set; }
     public float MaxJumpCount => _maxJumpCount;
     public BallStat BallStat => _ballStat;
@@ -345,5 +350,47 @@ public class PlayerController : MonoBehaviour
     {
         _jumpPanelController.SetCurrentJumps(currentJumpCount);
         _currentJumpCount = currentJumpCount;
+    }
+
+    public void RequestSizeChange()
+    {
+        _massChange += 0.5f;
+        _scaleChange += 1f;
+
+        if (_sizeChangeCoroutine == null)
+            _sizeChangeCoroutine = StartCoroutine(ChangeSize());
+    }
+    private IEnumerator ChangeSize()
+    {
+        float startMass = _rb.mass;
+        float startScale = transform.localScale.x;
+
+        float targetMass = startMass + _massChange;
+        float targetScale = Mathf.Min(startScale + _scaleChange, _maxScale);
+
+        _massChange = 0f;
+        _scaleChange = 0f;
+
+        float time = 0f;
+
+        while (time < 1f)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time);
+
+            _rb.mass = Mathf.Lerp(startMass, targetMass, t);
+            transform.localScale = Vector3.one *
+                Mathf.Lerp(startScale, targetScale, t);
+
+            yield return null;
+        }
+
+        _rb.mass = targetMass;
+        transform.localScale = Vector3.one * targetScale;
+
+        _sizeChangeCoroutine = null;
+
+        if (_massChange > 0f || _scaleChange > 0f)
+            _sizeChangeCoroutine = StartCoroutine(ChangeSize());
     }
 }
