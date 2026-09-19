@@ -1,22 +1,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class ResourcesData
+{
+    public int Tree;
+    public int Iron;
+    public int Refrigerant;
+    public float Energy;
+    public float Size;
+}
+
 public class GameManager
 {
-    private GameObject _prizeUI;
-    private GameObject _gameUI;
-
-    public GameObject PrizeUI { get { return _prizeUI; } }
-    public GameObject GameUI { get { return _gameUI; } }
+    private ResourcesData _resources;
+    public ResourcesData ResourcesData { get { return _resources; } set { _resources = value; } }
 
     public void Init()
     {
-        _prizeUI = Resources.Load<GameObject>("Prefabs/UIs/PrizeCanvas");
-        _gameUI = Resources.Load<GameObject>("Prefabs/UIs/DateCanvas");
+        _resources = new()
+        {
+            Tree = 0,
+            Iron = 0,
+            Refrigerant = 0,
+            Energy = 0,
+            Size = 6
+        };
     }
 
     public void Clear()
     {
-
+        _resources = new()
+        {
+            Tree = 0,
+            Iron = 0,
+            Refrigerant = 0,
+            Energy = 0,
+            Size = 6
+        };
     }
 }
