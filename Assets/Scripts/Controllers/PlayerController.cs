@@ -114,7 +114,7 @@ public class PlayerController : MonoBehaviour
         _velocityText.text = $"{_rb.linearVelocity.magnitude:F2} m/s";
         _heightText.text = $"{transform.position.y:F2} m";
 
-        Debug.Log($"IsGrounded: {IsGrounded}, GroundNormal: {_groundNormal}");
+        // Debug.Log($"IsGrounded: {IsGrounded}, GroundNormal: {_groundNormal}");
     }
 
     private void OnDisable()

@@ -97,14 +97,14 @@ public class PunkScene : MonoBehaviour
         _treeText.text = $"나무: {Managers.Game.ResourcesData.Tree}";
         _ironText.text = $"철: {Managers.Game.ResourcesData.Iron}";
 
-        _consumeText.text = $"{Mathf.Abs(Managers.Game.Consume)}";
-        _consumeSignText.text = Managers.Game.Consume switch
+        _consumeText.text = $"{Mathf.Abs(Managers.Game.EnergyDelta)}";
+        _consumeSignText.text = Managers.Game.EnergyDelta switch
         {
             > 0 => "▲",
             < 0 => "▼",
             _ => "-"
         };
-        _consumeSignText.color = Managers.Game.Consume switch
+        _consumeSignText.color = Managers.Game.EnergyDelta switch
         {
             > 0 => COLOR_ON,
             < 0 => COLOR_OFF,

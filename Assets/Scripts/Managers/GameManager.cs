@@ -44,6 +44,7 @@ public class GameManager
     private ResourcesData _resources;
     private float _elapsedTime;
     private float _secondsPerDay = 60f;
+    public float _consume => _consumes[CurrentDegree];
 
     public ResourcesData ResourcesData { get { return _resources; } set { _resources = value; } }
     public float ElapsedTime { get { return _elapsedTime; } set { _elapsedTime = value; } }
@@ -64,7 +65,8 @@ public class GameManager
             return $"{hour:00}:{minute:00}";
         }
     }
-    public int Consume => _consumes[CurrentDegree];
+    public float EnergyGain;
+    public float EnergyDelta => _consume + EnergyGain;
 
     public void Init()
     {
