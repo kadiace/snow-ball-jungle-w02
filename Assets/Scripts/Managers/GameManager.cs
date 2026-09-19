@@ -5,15 +5,66 @@ public class ResourcesData
 {
     public int Tree;
     public int Iron;
-    public int Refrigerant;
-    public float Energy;
+    public bool IsActive;
+    public float CurrentEnergy;
+    public float MaxEnergy;
     public float Size;
 }
 
 public class GameManager
 {
+    private readonly Dictionary<int, int> _temperatures = new()
+    {
+        {1, -10},
+        {2, -10},
+        {3, -10},
+        {4, -20},
+        {5, -10},
+        {6, -20},
+        {7, -10},
+        {8, -10},
+        {9, -20},
+        {10, -30},
+        {11, -20},
+        {12, -10},
+        {13, -20},
+        {14, -30},
+        {15, -40},
+        {16, -40},
+    };
+
+    private readonly Dictionary<int, int> _consumes = new()
+    {
+        {-10, -5},
+        {-20, -10},
+        {-30, -15},
+        {-40, -20},
+    };
+
     private ResourcesData _resources;
+    private float _elapsedTime;
+    private float _secondsPerDay = 60f;
+
     public ResourcesData ResourcesData { get { return _resources; } set { _resources = value; } }
+    public float ElapsedTime { get { return _elapsedTime; } set { _elapsedTime = value; } }
+    public int CurrentDay =>
+        Mathf.FloorToInt((float)(_elapsedTime / _secondsPerDay)) + 1;
+    public int CurrentDegree => _temperatures[CurrentDay];
+    public int NextDegree => _temperatures[CurrentDay + 1];
+    public float ElapsedInDayProgress => _elapsedTime % _secondsPerDay / _secondsPerDay;
+    public string CurrentTime
+    {
+        get
+        {
+            double totalMinutes = ElapsedInDayProgress * 24 * 60;
+
+            int hour = (int)((totalMinutes / 60) + 6) % 24;
+            int minute = (int)totalMinutes % 60;
+
+            return $"{hour:00}:{minute:00}";
+        }
+    }
+    public int Consume => _consumes[CurrentDegree];
 
     public void Init()
     {
@@ -21,10 +72,12 @@ public class GameManager
         {
             Tree = 0,
             Iron = 0,
-            Refrigerant = 0,
-            Energy = 0,
+            IsActive = true,
+            CurrentEnergy = 50,
+            MaxEnergy = 100,
             Size = 6
         };
+        _elapsedTime = 0f;
     }
 
     public void Clear()
@@ -33,9 +86,11 @@ public class GameManager
         {
             Tree = 0,
             Iron = 0,
-            Refrigerant = 0,
-            Energy = 0,
+            IsActive = true,
+            CurrentEnergy = 50,
+            MaxEnergy = 100,
             Size = 6
         };
+        _elapsedTime = 0f;
     }
 }
