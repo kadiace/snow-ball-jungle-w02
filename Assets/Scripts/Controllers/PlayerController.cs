@@ -383,6 +383,13 @@ public class PlayerController : MonoBehaviour
             _rb.mass = Managers.Game.ResourcesData.Mass;
             transform.localScale = Vector3.one * Managers.Game.ResourcesData.Scale;
 
+            Transform childTransform;
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                childTransform = transform.GetChild(i);
+                childTransform.localScale = Vector3.one / Managers.Game.ResourcesData.Scale;
+            }
+
             yield return null;
         }
 

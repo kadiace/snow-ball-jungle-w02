@@ -4,7 +4,7 @@ public class ResourceController : MonoBehaviour
 {
     void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player"))
+        if (!other.CompareTag("Player") || Managers.Game.ResourcesData.Mass > 10)
             return;
 
         PlayerController player = other.GetComponent<PlayerController>();
