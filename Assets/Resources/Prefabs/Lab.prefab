@@ -79,8 +79,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9f80325b8141674b810df59c67e178c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LabButtonController
-  Duration: 100
-  MaxDuration: 100
+  _lightRenderers:
+  - {fileID: 8000340163962767757}
+  - {fileID: 461513500480403838}
+  - {fileID: 3197604131924624784}
 --- !u!1 &1065917598343727559
 GameObject:
   m_ObjectHideFlags: 0

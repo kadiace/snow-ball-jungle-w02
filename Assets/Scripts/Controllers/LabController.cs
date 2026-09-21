@@ -15,6 +15,11 @@ public class LabController : FacilityInteractionController
     private InputAction _confirmAction;
     private InputAction _cancelAction;
 
+    private Material _lightOnMaterial;
+    private Material _lightOffMaterial;
+
+    [SerializeField] private Renderer[] _lightRenderers;
+
     protected override void Awake()
     {
         base.Awake();
@@ -37,9 +42,20 @@ public class LabController : FacilityInteractionController
 
         _cancelAction = InputSystem.actions.FindAction("Cancel");
         _cancelAction.performed += OnCancelPerformed;
+
+        Transform light = transform.Find("Light");
+
+        _lightOnMaterial = Resources.Load<Material>("Materials/LightOn");
+        _lightOffMaterial = Resources.Load<Material>("Materials/LightOff");
     }
 
-    private void OnDestroy()
+    void Update()
+    {
+        foreach (var renderer in _lightRenderers)
+            renderer.sharedMaterial = Managers.Game.ResourcesData.CurrentEnergy > 0 ? _lightOnMaterial : _lightOffMaterial;
+    }
+
+    void OnDestroy()
     {
         _confirmAction.performed -= OnConfirmPerformed;
         _cancelAction.performed -= OnCancelPerformed;
