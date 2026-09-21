@@ -10,6 +10,8 @@ public enum GameState
     TOWER,
     TEMPERATURE,
     DANGER,
+    FORECAST,
+    ENDING,
     GAMEOVER,
 }
 
@@ -45,8 +47,16 @@ public class PunkScene : MonoBehaviour
     전력을 유지할 방법을 찾아야 합니다.";
 
     static string GUIDE_DANGER = @"전력을 모두 소모했습니다.
-    30초 안으로 전력 공급원을 찾지 못하면
+    15초 안으로 전력 공급원을 찾지 못하면
     종자 보관소가 복구할 수 없는 피해를 입습니다.";
+
+    static string GUIDE_FORECAST = @"비상!
+    3일 뒤에 강력한 혹한이 찾아올 것으로 예측됐습니다.
+    단단히 준비하지 않으면 버티지 못할 것입니다.";
+
+    static string GUIDE_ENDING = @"예측된 모든 위험과 위협을
+    무사히 극복하는데 성공했습니다.
+    프로토콜을 종료합니다.";
 
     static string GUIDE_GAMEOVER = @"게임 오버!
     종자 보관소를 지키는데 실패했습니다.
@@ -58,18 +68,22 @@ public class PunkScene : MonoBehaviour
       {GameState.TOWER, GUIDE_TOWER},
       {GameState.TEMPERATURE, GUIDE_TEMPERATURE},
       {GameState.DANGER, GUIDE_DANGER},
+      {GameState.FORECAST, GUIDE_FORECAST},
+      {GameState.ENDING, GUIDE_ENDING},
       {GameState.GAMEOVER, GUIDE_GAMEOVER},
     };
 
     [SerializeField] private GameObject _directionalLight;
     [SerializeField] private GameObject _lab;
-    [SerializeField] private float _gameOverTime = 30f;
+    [SerializeField] private float _gameOverTime = 15f;
 
     private float _gameOverTimer;
     private bool _isGameOver;
+    private bool _isEnding;
 
     static private bool _hasTemperature;
     static private bool _hasDanger;
+    static private bool _hasForecast;
 
     private GameObject _guideUI;
     private GameObject _gameUI;
@@ -176,7 +190,22 @@ public class PunkScene : MonoBehaviour
 
     private void SetGameUI()
     {
-        if (Managers.Game.CurrentDegree == -20f && !_hasTemperature)
+        if (Managers.Game.CurrentDegree < -20f && !_hasTemperature)
+        {
+            _hasTemperature = true;
+            Managers.Game.OpenGuideUI(GameState.TEMPERATURE);
+        }
+        if (Managers.Game.CurrentDay == 12 && !_hasForecast)
+        {
+            _hasForecast = true;
+            Managers.Game.OpenGuideUI(GameState.FORECAST);
+        }
+        if (Managers.Game.CurrentDay == 18)
+        {
+            Managers.Game.OpenGuideUI(GameState.ENDING);
+            _isEnding = true;
+        }
+        if (Managers.Game.CurrentDay < -20f && !_hasTemperature)
         {
             _hasTemperature = true;
             Managers.Game.OpenGuideUI(GameState.TEMPERATURE);
@@ -288,7 +317,7 @@ public class PunkScene : MonoBehaviour
 
     private void OnGuideUIButtonClicked()
     {
-        if (_isGameOver)
+        if (_isGameOver || _isEnding)
             Managers.Game.ReloadScene();
         else
             CloseGuideUI();

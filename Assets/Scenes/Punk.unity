@@ -6307,7 +6307,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PunkScene
   _directionalLight: {fileID: 1789175851}
   _lab: {fileID: 9140315602264768541}
-  _gameOverTime: 30
+  _gameOverTime: 15
 --- !u!1 &1422894530
 GameObject:
   m_ObjectHideFlags: 0

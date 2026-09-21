@@ -152,7 +152,10 @@ public class PlayerController : MonoBehaviour
     {
         FacilityInteractionController nearestFacility = NearestFacility();
         if (nearestFacility == null || !Managers.Game.Researches.Contains(ResearchType.TowerWire) || nearestFacility is not TowerController tower || !tower.IsActivated)
+        {
+            _returnGuide.SetActive(false);
             return;
+        }
 
         _returnGuide.SetActive(true);
 
@@ -164,6 +167,8 @@ public class PlayerController : MonoBehaviour
         if (!GameInputController.Instance.ReturnPressed)
             return;
 
+        _interactGuide.SetActive(false);
+        _returnGuide.SetActive(false);
         tower.Return(this);
     }
 
