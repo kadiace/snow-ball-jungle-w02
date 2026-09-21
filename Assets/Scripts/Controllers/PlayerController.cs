@@ -208,6 +208,7 @@ public class PlayerController : MonoBehaviour
 
         _hasGroundContact = false;
     }
+
     private void Resize()
     {
         int resourceCount = Managers.Game.Woods.Count + Managers.Game.Irons.Count;
@@ -261,7 +262,7 @@ public class PlayerController : MonoBehaviour
             Vector3 velocity = _rb.linearVelocity;
             velocity.y = 0f;
             _rb.linearVelocity = velocity;
-            _rb.AddForce(-_gravityDir * jumpForce, ForceMode.Impulse);
+            _rb.AddForce(-_gravityDir * jumpForce * _rb.mass, ForceMode.Impulse);
         }
         else
         {

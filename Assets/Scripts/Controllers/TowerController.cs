@@ -76,7 +76,7 @@ public class TowerController : FacilityInteractionController
         _cancelAction = InputSystem.actions.FindAction("Cancel");
         _cancelAction.performed += OnCancelPerformed;
 
-        MaxDuration = 100;
+        MaxDuration = 200;
 
         Transform light = transform.Find("Light");
         _lightRenderer = light.GetComponent<Renderer>();
@@ -87,6 +87,7 @@ public class TowerController : FacilityInteractionController
 
         _startPoint = transform.position + Vector3.up * 100;
     }
+
     private void Start()
     {
         _line.useWorldSpace = true;
