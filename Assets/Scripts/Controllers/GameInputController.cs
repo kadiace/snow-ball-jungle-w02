@@ -18,11 +18,9 @@ public class GameInputController : MonoBehaviour
 
     public Vector2 MoveInput { get; private set; }
     public Vector2 LookInput { get; private set; }
-    public bool DiveInput { get; private set; }
-    public float ResizeInput { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool JumpHeld { get; private set; }
-    public bool RestartPressed { get; private set; }
+    public bool InteractPressed { get; private set; }
     public bool GamePadConnected { get; private set; }
     private void Awake()
     {
@@ -67,11 +65,9 @@ public class GameInputController : MonoBehaviour
     {
         MoveInput = inputActions.Player.Move.ReadValue<Vector2>();
         LookInput = inputActions.Player.Look.ReadValue<Vector2>();
-        DiveInput = inputActions.Player.Dive.IsPressed();
-        ResizeInput = inputActions.Player.Resize.ReadValue<float>();
         JumpPressed = inputActions.Player.Jump.WasPressedThisFrame();
         JumpHeld = inputActions.Player.Jump.IsPressed();
-        RestartPressed = inputActions.Player.Restart.WasPressedThisFrame();
+        InteractPressed = inputActions.Player.Interact.WasPressedThisFrame();
     }
 
     public void SetInputMode(InputMode mode)
@@ -79,8 +75,7 @@ public class GameInputController : MonoBehaviour
         _inputMode = mode;
 
         JumpPressed = false;
-        DiveInput = false;
-        ResizeInput = 0f;
+        InteractPressed = false;
         MoveInput = Vector2.zero;
 
         if (mode == InputMode.Player)

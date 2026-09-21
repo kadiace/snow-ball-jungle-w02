@@ -8,6 +8,7 @@ public class PunkScene : MonoBehaviour
     private readonly Color COLOR_OFF = new Color32(231, 76, 60, 255);
 
     [SerializeField] private GameObject _directionalLight;
+    [SerializeField] private GameObject _lab;
     [SerializeField] private float _secondsPerDay = 60f;
 
     private GameObject _prizeUI;

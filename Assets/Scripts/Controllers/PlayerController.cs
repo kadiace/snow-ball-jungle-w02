@@ -1,10 +1,14 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    static string INTERACT_GUIDE = "{Interact} 를 눌러 상호작용";
+
     [Header("Ground")]
     [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private float _groundCheckDistance = 0.1f;
@@ -36,6 +40,8 @@ public class PlayerController : MonoBehaviour
     private float _jumpBufferTimer;
     private float _jumpGroundedCheckLockTimer;
     private float _coyoteTimer;
+    private bool _interactInput;
+    private GameObject _interactGuide;
 
     private Vector3 _gravityDir = Vector3.down;
     private Vector3 _groundNormal = Vector3.up;
@@ -51,10 +57,18 @@ public class PlayerController : MonoBehaviour
     public float MaxJumpCount => _maxJumpCount;
     public BallStat BallStat => _ballStat;
 
+    public string CurrentTag { get; set; }
+    public List<GameObject> Trees { get; private set; }
+    public List<GameObject> Metals { get; private set; }
+    public List<FacilityInteractionController> Facilities { get; private set; }
+
     private void Awake()
     {
         GameObject jumpCountCanvas = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/JumpCountCanvas"));
         _jumpPanelController = jumpCountCanvas.GetComponent<JumpPanelController>();
+
+        _interactGuide = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/InteractGuide"));
+        _interactGuide.SetActive(false);
 
         _rb = GetComponent<Rigidbody>();
         _rb.useGravity = true;
@@ -72,18 +86,24 @@ public class PlayerController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        Trees = new();
+        Metals = new();
+        Facilities = new();
     }
 
     private void Update()
     {
         ProcessMoveInput();
         ProcessJumpInput();
+        ProcessInteractInput();
     }
 
     private void FixedUpdate()
     {
         CheckGround();
 
+        ProcessInteract();
         ProcessJump();
         ApplyMovement();
         ClampGravityVelocity();
@@ -109,11 +129,49 @@ public class PlayerController : MonoBehaviour
             _jumpBufferTimer = Mathf.Max(0f, _jumpBufferTimer - Time.deltaTime);
     }
 
+    private void ProcessInteractInput()
+    {
+        if (Facilities.Count <= 0)
+        {
+            _interactGuide.SetActive(false);
+            return;
+        }
+        _interactGuide.SetActive(true);
+        Text text = _interactGuide.transform.Find("Panel/Guide").GetComponent<Text>();
+        string interact = Util.GetBindingName("Interact");
+        string message = INTERACT_GUIDE.Replace("{Interact}", interact);
+        text.text = message;
+        _interactInput = GameInputController.Instance.InteractPressed;
+    }
+
     private void ApplyCurrentSizeStat()
     {
         transform.localScale = Vector3.one * Managers.Game.ResourcesData.Scale;
         _rb.mass = Managers.Game.ResourcesData.Mass;
         _physicsMaterial.bounciness = _ballStat.Bounciness;
+    }
+
+    private void ProcessInteract()
+    {
+        if (!_interactInput)
+            return;
+
+        float minDistance = float.MaxValue;
+        FacilityInteractionController nearestFacility = null;
+        Facilities.ForEach(facility =>
+        {
+            float distance = Vector3.Distance(transform.position, facility.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearestFacility = facility;
+            }
+        });
+
+        if (nearestFacility == null)
+            return;
+
+        nearestFacility.OpenCanvas();
     }
 
     private void CheckGround()

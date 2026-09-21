@@ -37,29 +37,19 @@
                     "priority": 0
                 },
                 {
-                    "name": "Resize",
-                    "type": "Value",
-                    "id": "1a0229f6-68e8-4103-9856-8237f7324e9d",
-                    "expectedControlType": "Axis",
-                    "processors": "",
-                    "interactions": "Press",
-                    "initialStateCheck": true,
-                    "priority": 0
-                },
-                {
-                    "name": "Dive",
-                    "type": "Button",
-                    "id": "bfd26de5-bf20-4186-a04c-2ed7fe9eedfa",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true,
-                    "priority": 0
-                },
-                {
                     "name": "Restart",
                     "type": "Button",
                     "id": "66f840da-b1c3-4a9d-836f-c0c09be101be",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "e9218724-212e-4b5f-b747-25b7e4597f87",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -201,90 +191,24 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "1D Axis",
-                    "id": "0ff8116c-6482-4f20-a0d7-200b7fe9a1ee",
-                    "path": "1DAxis",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Resize",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "negative",
-                    "id": "9d223819-32d8-4f97-9772-9ff388afaabf",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Resize",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "positive",
-                    "id": "f0b406f5-19ee-49e8-b678-4ef2569e26e0",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Resize",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "1D Axis",
-                    "id": "8703d003-6b29-4d47-b923-2ea2472ddd93",
-                    "path": "1DAxis",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Resize",
-                    "isComposite": true,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "negative",
-                    "id": "1dba0ca7-0caf-4355-a1e9-20347aeb1342",
-                    "path": "<Gamepad>/leftTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Resize",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "positive",
-                    "id": "3330ef41-a6f5-4bd6-9e75-22242863eb26",
-                    "path": "<Gamepad>/rightTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Resize",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
                     "name": "",
-                    "id": "464ba3c8-83ca-43a4-8f9b-f901d1b06889",
-                    "path": "<Keyboard>/leftShift",
+                    "id": "f920f676-033e-4ee8-a18c-675c2fc3373d",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Dive",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "52eeda99-777c-4a2e-b9e2-231a2d390bf9",
+                    "id": "03ab996f-0b7b-42ad-bd77-5b4802888297",
                     "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Dive",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -303,6 +227,16 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "Cancel",
+                    "type": "Button",
+                    "id": "d27404e9-68ef-41fc-9fee-ac750a24e25a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -314,6 +248,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "48496869-a0a2-4072-a76f-d4ef5019fef1",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
