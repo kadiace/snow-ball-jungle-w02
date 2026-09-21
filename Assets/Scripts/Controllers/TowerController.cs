@@ -1,0 +1,165 @@
+
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+
+public enum TowerButton
+{
+    Activate,
+    Repair
+}
+
+public class TowerController : FacilityInteractionController
+{
+    private Text _wood;
+    private Text _iron;
+    private GameObject _durationPanel;
+    private Slider _duration;
+    private Button _confirm;
+    private Text _confirmText;
+
+    private InputAction _confirmAction;
+    private InputAction _cancelAction;
+
+    private bool _isActivated;
+    private int _actualRepairWoodCost;
+    private int _actualRepairIronCost;
+
+    [Header("Activate")]
+    [SerializeField] private int _activateWoodCost;
+    [SerializeField] private int _activateIronCost;
+
+    [Header("Repair")]
+    [SerializeField] private int _repairWoodCost;
+    [SerializeField] private int _repairIronCost;
+
+    public float Duration { get; set; }
+    public float MaxDuration { get; set; }
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        _wood = _canvas.transform.Find("Panel/ResourcePanel/TextPanel/Wood").GetComponent<Text>();
+        _iron = _canvas.transform.Find("Panel/ResourcePanel/TextPanel/Iron").GetComponent<Text>();
+
+        _durationPanel = _canvas.transform.Find("Panel/ResourcePanel/DurationPanel").gameObject;
+        _duration = _canvas.transform.Find("Panel/ResourcePanel/DurationPanel/Duration").GetComponent<Slider>();
+
+        _confirm = _canvas.transform.Find("Panel/ButtonPanel/Confirm").GetComponent<Button>();
+        _confirm.onClick.AddListener(OnButtonClicked);
+        _confirmText = _canvas.transform.Find("Panel/ButtonPanel/Confirm/Confirm").GetComponent<Text>();
+
+        _confirmAction = InputSystem.actions.FindAction("Confirm");
+        _confirmAction.performed += OnConfirmPerformed;
+
+        _cancelAction = InputSystem.actions.FindAction("Cancel");
+        _cancelAction.performed += OnCancelPerformed;
+
+        MaxDuration = 100;
+    }
+
+    private void OnButtonClicked()
+    {
+
+        if (_isActivated)
+        {
+            Managers.Game.ResourcesData.Wood -= _actualRepairWoodCost;
+            Managers.Game.ResourcesData.Iron -= _actualRepairIronCost;
+            Duration = MaxDuration;
+            SetUI();
+        }
+        else
+        {
+            Managers.Game.ResourcesData.Wood -= _activateWoodCost;
+            Managers.Game.ResourcesData.Iron -= _activateIronCost;
+            _isActivated = true;
+            Duration = MaxDuration;
+            SetUI();
+        }
+    }
+
+    private void OnConfirmPerformed(InputAction.CallbackContext context)
+    {
+        if (!_canvas.activeSelf)
+            return;
+        GameObject selectedObject = EventSystem.current.currentSelectedGameObject;
+        if (selectedObject == null)
+        {
+            EventSystem.current.SetSelectedGameObject(_confirm.gameObject);
+            return;
+        }
+
+        Button button = selectedObject.GetComponent<Button>();
+        if (!button.interactable)
+            return;
+        button.onClick.Invoke();
+    }
+
+    private void OnCancelPerformed(InputAction.CallbackContext context)
+    {
+        if (!_canvas.activeSelf)
+            return;
+
+        CloseCanvas();
+    }
+
+    public override void OpenCanvas()
+    {
+        SetUI();
+        base.OpenCanvas();
+    }
+
+    private void SetUI()
+    {
+        float durationRatio = Duration / MaxDuration;
+        _duration.value = durationRatio;
+
+        _actualRepairWoodCost = Mathf.CeilToInt(_repairWoodCost * (1 - durationRatio));
+        _actualRepairIronCost = Mathf.CeilToInt(_repairIronCost * (1 - durationRatio));
+
+        int woodCost;
+        int ironCost;
+
+        if (_isActivated)
+        {
+            _durationPanel.SetActive(true);
+
+            woodCost = _actualRepairWoodCost;
+            ironCost = _actualRepairIronCost;
+
+            _confirmText.text = "수리하기";
+        }
+        else
+        {
+            _durationPanel.SetActive(false);
+
+            woodCost = _activateWoodCost;
+            ironCost = _activateIronCost;
+
+            _confirmText.text = "활성화하기";
+        }
+
+        _wood.text = $"필요한 나무: {woodCost}";
+        _iron.text = $"필요한 철: {ironCost}";
+
+        bool hasEnoughWood = Managers.Game.ResourcesData.Wood >= woodCost;
+        bool hasEnoughIron = Managers.Game.ResourcesData.Iron >= ironCost;
+
+        _wood.color = hasEnoughWood
+            ? Color.black
+            : Color.red;
+
+        _iron.color = hasEnoughIron
+            ? Color.black
+            : Color.red;
+
+        _confirm.interactable = hasEnoughWood && hasEnoughIron;
+    }
+
+    public void DeactivateTower()
+    {
+        _isActivated = false;
+    }
+}

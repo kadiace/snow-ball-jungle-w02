@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: 1016427415852738198}
   - component: {fileID: 5060802937870248681}
   m_Layer: 5
-  m_Name: Tree
+  m_Name: Wood
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2034,7 +2034,7 @@ GameObject:
   - component: {fileID: 6454239574108063547}
   - component: {fileID: 5361105630305166215}
   m_Layer: 5
-  m_Name: TreePanel
+  m_Name: WoodPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

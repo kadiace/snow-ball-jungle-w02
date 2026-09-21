@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class ResourcesData
 {
-    public int Tree;
-    public int Metal;
+    public int Wood;
+    public int Iron;
     public bool IsActive;
     public float CurrentEnergy;
     public float MaxEnergy;
@@ -73,8 +73,8 @@ public class GameManager
     {
         _resources = new()
         {
-            Tree = 0,
-            Metal = 0,
+            Wood = 0,
+            Iron = 0,
             IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,
@@ -88,8 +88,8 @@ public class GameManager
     {
         _resources = new()
         {
-            Tree = 0,
-            Metal = 0,
+            Wood = 0,
+            Iron = 0,
             IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,

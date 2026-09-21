@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class FacilityInteractionController : MonoBehaviour
+public abstract class FacilityInteractionController : MonoBehaviour
 {
-    private GameObject _canvas;
+    protected GameObject _canvas;
 
-    void Awake()
+    protected virtual void Awake()
     {
         _canvas = transform.Find("Canvas").gameObject;
         _canvas.SetActive(false);
@@ -26,7 +26,7 @@ public class FacilityInteractionController : MonoBehaviour
         player.Facilities.Remove(this);
     }
 
-    public void OpenCanvas()
+    public virtual void OpenCanvas()
     {
         GameInputController.Instance.SetInputMode(InputMode.UI);
         Time.timeScale = 0f;
@@ -36,7 +36,7 @@ public class FacilityInteractionController : MonoBehaviour
         _canvas.SetActive(true);
     }
 
-    private void CloseCanvas()
+    protected void CloseCanvas()
     {
         GameInputController.Instance.SetInputMode(InputMode.Player);
         Time.timeScale = 1f;

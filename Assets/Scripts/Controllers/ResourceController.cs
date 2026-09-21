@@ -10,9 +10,9 @@ public class ResourceController : MonoBehaviour
         PlayerController player = other.GetComponent<PlayerController>();
 
         if (gameObject.CompareTag("Tree"))
-            Managers.Game.ResourcesData.Tree += 1;
+            Managers.Game.ResourcesData.Wood += 1;
         if (gameObject.CompareTag("Metal"))
-            Managers.Game.ResourcesData.Metal += 1;
+            Managers.Game.ResourcesData.Iron += 1;
 
         player.RequestSizeChange();
 

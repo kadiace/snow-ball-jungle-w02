@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4017907582016466028}
   - component: {fileID: 5347098063638548175}
-  - component: {fileID: 1682814941967250812}
+  - component: {fileID: 3099833094268590743}
   m_Layer: 0
   m_Name: Lab
   m_TagString: Untagged
@@ -67,7 +67,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1682814941967250812
+--- !u!114 &3099833094268590743
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -76,9 +76,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 402294724129970400}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08fda5dbeb330ed43ac35dd411c8e9dd, type: 3}
+  m_Script: {fileID: 11500000, guid: d9f80325b8141674b810df59c67e178c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FacilityInteractionController
+  m_EditorClassIdentifier: Assembly-CSharp::LabButtonController
+  Duration: 100
+  MaxDuration: 100
 --- !u!1 &1065917598343727559
 GameObject:
   m_ObjectHideFlags: 0

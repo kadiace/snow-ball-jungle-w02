@@ -66,7 +66,7 @@ public class PunkScene : MonoBehaviour
     private Image _activePanel;
     private Text _activeText;
     private Slider _energe;
-    private Text _treeText;
+    private Text _woodText;
     private Text _ironText;
     private Text _consumeText;
     private Text _consumeSignText;
@@ -116,7 +116,7 @@ public class PunkScene : MonoBehaviour
         _activeText = _gameUI.transform.Find("Panel/LeftPanel/OnoffPanel/Onoff").GetComponent<Text>();
         _energe = _gameUI.transform.Find("Panel/LeftPanel/EnergyPanel/Energy").GetComponent<Slider>();
 
-        _treeText = _gameUI.transform.Find("Panel/LeftPanel/TreePanel/Tree").GetComponent<Text>();
+        _woodText = _gameUI.transform.Find("Panel/LeftPanel/WoodPanel/Wood").GetComponent<Text>();
         _ironText = _gameUI.transform.Find("Panel/LeftPanel/IronPanel/Iron").GetComponent<Text>();
         _consumeText = _gameUI.transform.Find("Panel/LeftPanel/EnergyConsumePanel/EnergyConsume").GetComponent<Text>();
         _consumeSignText = _gameUI.transform.Find("Panel/LeftPanel/EnergyConsumePanel/EnergySign").GetComponent<Text>();
@@ -157,8 +157,8 @@ public class PunkScene : MonoBehaviour
         _nextDayText.text = $"Day {Managers.Game.CurrentDay + 1}";
         _nextDegreeText.text = $"{Managers.Game.NextDegree} °C";
 
-        _treeText.text = $"나무: {Managers.Game.ResourcesData.Tree}";
-        _ironText.text = $"철: {Managers.Game.ResourcesData.Metal}";
+        _woodText.text = $"나무: {Managers.Game.ResourcesData.Wood}";
+        _ironText.text = $"철: {Managers.Game.ResourcesData.Iron}";
 
         _consumeText.text = $"{Mathf.Abs(Managers.Game.EnergyDelta)}";
         _consumeSignText.text = Managers.Game.EnergyDelta switch
@@ -203,11 +203,17 @@ public class PunkScene : MonoBehaviour
 
     private void OnConfirmPerformed(InputAction.CallbackContext context)
     {
+        if (!_guideUI.activeSelf)
+            return;
+
         OnGuideUIButtonClicked();
     }
 
     private void OnCancelPerformed(InputAction.CallbackContext context)
     {
+        if (!_guideUI.activeSelf)
+            return;
+
         OnGuideUIButtonClicked();
     }
 

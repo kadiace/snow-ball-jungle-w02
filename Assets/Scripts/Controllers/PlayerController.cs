@@ -40,7 +40,6 @@ public class PlayerController : MonoBehaviour
     private float _jumpBufferTimer;
     private float _jumpGroundedCheckLockTimer;
     private float _coyoteTimer;
-    private bool _interactInput;
     private GameObject _interactGuide;
 
     private Vector3 _gravityDir = Vector3.down;
@@ -103,7 +102,6 @@ public class PlayerController : MonoBehaviour
     {
         CheckGround();
 
-        ProcessInteract();
         ProcessJump();
         ApplyMovement();
         ClampGravityVelocity();
@@ -141,19 +139,8 @@ public class PlayerController : MonoBehaviour
         string interact = Util.GetBindingName("Interact");
         string message = INTERACT_GUIDE.Replace("{Interact}", interact);
         text.text = message;
-        _interactInput = GameInputController.Instance.InteractPressed;
-    }
 
-    private void ApplyCurrentSizeStat()
-    {
-        transform.localScale = Vector3.one * Managers.Game.ResourcesData.Scale;
-        _rb.mass = Managers.Game.ResourcesData.Mass;
-        _physicsMaterial.bounciness = _ballStat.Bounciness;
-    }
-
-    private void ProcessInteract()
-    {
-        if (!_interactInput)
+        if (!GameInputController.Instance.InteractPressed)
             return;
 
         float minDistance = float.MaxValue;
@@ -172,6 +159,13 @@ public class PlayerController : MonoBehaviour
             return;
 
         nearestFacility.OpenCanvas();
+    }
+
+    private void ApplyCurrentSizeStat()
+    {
+        transform.localScale = Vector3.one * Managers.Game.ResourcesData.Scale;
+        _rb.mass = Managers.Game.ResourcesData.Mass;
+        _physicsMaterial.bounciness = _ballStat.Bounciness;
     }
 
     private void CheckGround()
