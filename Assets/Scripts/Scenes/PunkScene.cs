@@ -77,6 +77,7 @@ public class PunkScene : MonoBehaviour
     private Text _activeText;
     private Text _energyText;
     private Slider _energe;
+    private Text _energyCount;
     private Text _woodText;
     private Text _ironText;
     private Text _consumeText;
@@ -142,6 +143,7 @@ public class PunkScene : MonoBehaviour
         _activeText = _gameUI.transform.Find("Panel/LeftPanel/OnoffPanel/Onoff").GetComponent<Text>();
         _energyText = _gameUI.transform.Find("Panel/LeftPanel/EnergyPanel/EnergyText").GetComponent<Text>();
         _energe = _gameUI.transform.Find("Panel/LeftPanel/EnergyPanel/Energy").GetComponent<Slider>();
+        _energyCount = _gameUI.transform.Find("Panel/LeftPanel/EnergyPanel/EnergyCount").GetComponent<Text>();
 
         _woodText = _gameUI.transform.Find("Panel/LeftPanel/WoodPanel/Wood").GetComponent<Text>();
         _ironText = _gameUI.transform.Find("Panel/LeftPanel/IronPanel/Iron").GetComponent<Text>();
@@ -187,6 +189,7 @@ public class PunkScene : MonoBehaviour
             _activePanel.color = COLOR_ON;
             _activeText.text = "ON";
             _energyText.text = "전력: ";
+            _energyCount.text = $"{Managers.Game.ResourcesData.CurrentEnergy:F0} / {Managers.Game.ResourcesData.MaxEnergy:F0}";
             _energe.fillRect.GetComponent<Image>().color = COLOR_ENERGY;
             _energe.value = Managers.Game.ResourcesData.CurrentEnergy / Managers.Game.ResourcesData.MaxEnergy;
             _gameOverTimer = _gameOverTime;
@@ -201,6 +204,7 @@ public class PunkScene : MonoBehaviour
             _activePanel.color = COLOR_OFF;
             _activeText.text = "OFF";
             _energyText.text = "정지: ";
+            _energyCount.text = $"{_gameOverTimer / 60f:00}:{_gameOverTimer % 60f:00}";
             _energe.fillRect.GetComponent<Image>().color = COLOR_EMERGENCY;
             _energe.value = _gameOverTimer / _gameOverTime;
             _gameOverTimer -= Time.deltaTime;
@@ -227,7 +231,7 @@ public class PunkScene : MonoBehaviour
         };
 
         _timeText.text = $"{Managers.Game.CurrentTime}";
-        _sizeText.text = $"눈덩이 무게: {Managers.Game.ResourcesData.Mass:F2}";
+        _sizeText.text = $"크기: {Managers.Game.ResourcesData.Scale:F2}";
     }
 
     private void CheckGameOver()

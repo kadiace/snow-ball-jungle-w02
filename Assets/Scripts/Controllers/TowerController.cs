@@ -78,7 +78,7 @@ public class TowerController : FacilityInteractionController
         _cancelAction = InputSystem.actions.FindAction("Cancel");
         _cancelAction.performed += OnCancelPerformed;
 
-        MaxDuration = 200;
+        MaxDuration = 180f;
 
         Transform light = transform.Find("Light");
         _lightRenderer = light.GetComponent<Renderer>();
