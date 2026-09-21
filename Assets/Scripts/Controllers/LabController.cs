@@ -39,6 +39,12 @@ public class LabController : FacilityInteractionController
         _cancelAction.performed += OnCancelPerformed;
     }
 
+    private void OnDestroy()
+    {
+        _confirmAction.performed -= OnConfirmPerformed;
+        _cancelAction.performed -= OnCancelPerformed;
+    }
+
     private void OnActivateButtonClicked()
     {
 

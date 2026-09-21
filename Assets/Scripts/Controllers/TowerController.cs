@@ -45,6 +45,8 @@ public class TowerController : FacilityInteractionController
     {
         base.Awake();
 
+        Managers.Game.Towers.Add(this);
+
         _wood = _canvas.transform.Find("Panel/ResourcePanel/TextPanel/Wood").GetComponent<Text>();
         _iron = _canvas.transform.Find("Panel/ResourcePanel/TextPanel/Iron").GetComponent<Text>();
 
@@ -69,6 +71,12 @@ public class TowerController : FacilityInteractionController
         _lightOffMaterial = Resources.Load<Material>("Materials/LightOff");
     }
 
+    private void OnDestroy()
+    {
+        _confirmAction.performed -= OnConfirmPerformed;
+        _cancelAction.performed -= OnCancelPerformed;
+    }
+
     private void OnButtonClicked()
     {
 
@@ -85,6 +93,7 @@ public class TowerController : FacilityInteractionController
             Managers.Game.PopIron(_activateIronCost);
             _isActivated = true;
             Duration = MaxDuration;
+            Managers.Game.ActivatedTowers.Add(this);
             _lightRenderer.sharedMaterial = _lightOnMaterial;
             SetUI();
         }
@@ -172,5 +181,6 @@ public class TowerController : FacilityInteractionController
     {
         _isActivated = false;
         _lightRenderer.sharedMaterial = _lightOffMaterial;
+        Managers.Game.ActivatedTowers.Remove(this);
     }
 }

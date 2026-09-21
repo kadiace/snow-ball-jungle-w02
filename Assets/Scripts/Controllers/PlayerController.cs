@@ -79,9 +79,6 @@ public class PlayerController : MonoBehaviour
         _jumpPanelController.SetMaxJumps(_maxJumpCount);
         SetCurrentJumpCount(_maxJumpCount);
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         Facilities = new();
     }
 

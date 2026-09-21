@@ -36,14 +36,14 @@ public class Wheel : MonoBehaviour
             if (!_isRotating)
             {
                 _isRotating = true;
-                Managers.Game.EnergyGain += 10;
+                Managers.Game.Wheels.Add(this);
             }
 
         }
         else if (_isRotating && Time.time - _lastRotateTime >= _stopDelay)
         {
             _isRotating = false;
-            Managers.Game.EnergyGain -= 10;
+            Managers.Game.Wheels.Remove(this);
         }
 
         _prevYAngle = currentYAngle;

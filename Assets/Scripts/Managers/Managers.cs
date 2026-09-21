@@ -55,5 +55,8 @@ public class Managers : MonoBehaviour
     public static void Clear()
     {
         Game.Clear();
+
+        GameObject go = GameObject.Find("@App");
+        Destroy(go);
     }
 }

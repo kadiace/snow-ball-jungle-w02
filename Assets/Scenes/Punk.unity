@@ -45098,6 +45098,7 @@ MonoBehaviour:
   _directionalLight: {fileID: 1789175851}
   _lab: {fileID: 9140315602264768541}
   _secondsPerDay: 60
+  _gameOverTime: 5
 --- !u!4 &1404230804 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1041661343892750656, guid: b04e532123f23724fb523f2370b13b4b, type: 3}

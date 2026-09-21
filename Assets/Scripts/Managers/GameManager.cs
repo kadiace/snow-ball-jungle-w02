@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ResourcesData
 {
-    public bool IsActive;
     public float CurrentEnergy;
     public float MaxEnergy;
     public float Scale;
@@ -32,7 +32,7 @@ public class GameManager
         {16, -40},
     };
 
-    private readonly Dictionary<int, int> _consumes = new()
+    private readonly Dictionary<int, int> _labConsumes = new()
     {
         {-10, -5},
         {-20, -10},
@@ -43,11 +43,16 @@ public class GameManager
     private ResourcesData _resources;
     private float _elapsedTime;
     private float _secondsPerDay = 60f;
-    private float _consume => _consumes[CurrentDegree];
+    private float _labConsume => _labConsumes[CurrentDegree];
+    private float _energyGain => Wheels.Count * 10 + ActivatedTowers.Count * 5;
+
+    public List<TowerController> Towers { get; private set; }
 
     public ResourcesData ResourcesData { get { return _resources; } set { _resources = value; } }
     public List<GameObject> Woods { get; private set; }
     public List<GameObject> Irons { get; private set; }
+    public List<Wheel> Wheels { get; private set; }
+    public List<TowerController> ActivatedTowers { get; private set; }
     public float ElapsedTime { get { return _elapsedTime; } set { _elapsedTime = value; } }
     public int CurrentDay =>
         Mathf.FloorToInt((float)(_elapsedTime / _secondsPerDay)) + 1;
@@ -66,14 +71,13 @@ public class GameManager
             return $"{hour:00}:{minute:00}";
         }
     }
-    public float EnergyGain;
-    public float EnergyDelta => _consume + EnergyGain;
+    public float EnergyDelta => _labConsume + _energyGain;
+    public PunkScene Scene;
 
     public void Init()
     {
         _resources = new()
         {
-            IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,
             Scale = 6,
@@ -81,6 +85,9 @@ public class GameManager
         };
         Woods = new();
         Irons = new();
+        Wheels = new();
+        Towers = new();
+        ActivatedTowers = new();
         _elapsedTime = 0f;
     }
 
@@ -88,7 +95,6 @@ public class GameManager
     {
         _resources = new()
         {
-            IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,
             Scale = 6,
@@ -96,6 +102,9 @@ public class GameManager
         };
         Woods = new();
         Irons = new();
+        Wheels = new();
+        Towers = new();
+        ActivatedTowers = new();
         _elapsedTime = 0f;
     }
 
@@ -121,5 +130,16 @@ public class GameManager
             Object.Destroy(obj);
         }
 
+    }
+
+    public void OpenGuideUI(GameState gameState)
+    {
+        Scene.OpenGuideUI(gameState);
+    }
+
+    public void ReloadScene()
+    {
+        Managers.Clear();
+        SceneManager.LoadScene(0);
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum GameState
@@ -16,6 +17,8 @@ public class PunkScene : MonoBehaviour
 {
     private readonly Color COLOR_ON = new Color32(46, 204, 113, 255);
     private readonly Color COLOR_OFF = new Color32(231, 76, 60, 255);
+    private readonly Color COLOR_ENERGY = new Color32(102, 213, 255, 255);
+    private readonly Color COLOR_EMERGENCY = new Color32(255, 102, 102, 255);
 
     static string GUIDE_INITIAL = @"종자 보관소에 전력 공급이 끊겨 복구 프로토콜이 동작했고
     그 결과 당신이 깨어났습니다.
@@ -38,7 +41,8 @@ public class PunkScene : MonoBehaviour
     
     종자 보관소 온도 유지 장치의 전력 소모량이 증가하고,
     에너지 중개소의 내구도가 더 빠르게 감소합니다.
-    {} ";
+    
+    전력을 유지할 방법을 찾아야 합니다.";
 
     static string GUIDE_DANGER = @"전력을 모두 소모했습니다.
     30초 안으로 전력 공급원을 찾지 못하면
@@ -60,11 +64,16 @@ public class PunkScene : MonoBehaviour
     [SerializeField] private GameObject _directionalLight;
     [SerializeField] private GameObject _lab;
     [SerializeField] private float _secondsPerDay = 60f;
+    [SerializeField] private float _gameOverTime = 30f;
+
+    private float _gameOverTimer;
+    private bool _isGameOver;
 
     private GameObject _guideUI;
     private GameObject _gameUI;
     private Image _activePanel;
     private Text _activeText;
+    private Text _energyText;
     private Slider _energe;
     private Text _woodText;
     private Text _ironText;
@@ -83,6 +92,10 @@ public class PunkScene : MonoBehaviour
 
     void Awake()
     {
+        Managers.Game.Scene = this;
+
+        _gameOverTimer = _gameOverTime;
+
         _guideUI = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/GuideCanvas"));
         _guideUI.SetActive(false);
 
@@ -103,9 +116,17 @@ public class PunkScene : MonoBehaviour
 
     void Update()
     {
+        CheckGameOver();
         Managers.Game.ElapsedTime += Time.deltaTime;
         RotateSun();
+        ApplyEnergyDelta();
         SetGameUI();
+    }
+
+    private void OnDestroy()
+    {
+        _confirmAction.performed -= OnConfirmPerformed;
+        _cancelAction.performed -= OnCancelPerformed;
     }
 
     private void InitGameUI()
@@ -114,6 +135,7 @@ public class PunkScene : MonoBehaviour
 
         _activePanel = _gameUI.transform.Find("Panel/LeftPanel/OnoffPanel").GetComponent<Image>();
         _activeText = _gameUI.transform.Find("Panel/LeftPanel/OnoffPanel/Onoff").GetComponent<Text>();
+        _energyText = _gameUI.transform.Find("Panel/LeftPanel/EnergyPanel/EnergyText").GetComponent<Text>();
         _energe = _gameUI.transform.Find("Panel/LeftPanel/EnergyPanel/Energy").GetComponent<Slider>();
 
         _woodText = _gameUI.transform.Find("Panel/LeftPanel/WoodPanel/Wood").GetComponent<Text>();
@@ -137,22 +159,37 @@ public class PunkScene : MonoBehaviour
             _initialRotation * Quaternion.AngleAxis(angle, Vector3.up);
     }
 
+    private void ApplyEnergyDelta()
+    {
+        float secondsPerHour = _secondsPerDay / 24f;
+
+        Managers.Game.ResourcesData.CurrentEnergy += Managers.Game.EnergyDelta * (Time.deltaTime / secondsPerHour);
+        Managers.Game.ResourcesData.CurrentEnergy = Mathf.Clamp(Managers.Game.ResourcesData.CurrentEnergy, 0f, Managers.Game.ResourcesData.MaxEnergy);
+    }
+
     private void SetGameUI()
     {
         _currentDayText.text = $"Day {Managers.Game.CurrentDay}";
         _currentDegreeText.text = $"{Managers.Game.CurrentDegree} °C";
 
-        if (Managers.Game.ResourcesData.IsActive)
+        if (Managers.Game.ResourcesData.CurrentEnergy > 0)
         {
             _activePanel.color = COLOR_ON;
             _activeText.text = "ON";
+            _energyText.text = "전력: ";
+            _energe.fillRect.GetComponent<Image>().color = COLOR_ENERGY;
+            _energe.value = Managers.Game.ResourcesData.CurrentEnergy / Managers.Game.ResourcesData.MaxEnergy;
+            _gameOverTimer = _gameOverTime;
         }
         else
         {
             _activePanel.color = COLOR_OFF;
             _activeText.text = "OFF";
+            _energyText.text = "정지: ";
+            _energe.fillRect.GetComponent<Image>().color = COLOR_EMERGENCY;
+            _energe.value = _gameOverTimer / _gameOverTime;
+            _gameOverTimer -= Time.deltaTime;
         }
-        _energe.value = Managers.Game.ResourcesData.CurrentEnergy / Managers.Game.ResourcesData.MaxEnergy;
 
         _nextDayText.text = $"Day {Managers.Game.CurrentDay + 1}";
         _nextDegreeText.text = $"{Managers.Game.NextDegree} °C";
@@ -178,7 +215,14 @@ public class PunkScene : MonoBehaviour
         _sizeText.text = $"눈덩이 무게: {Managers.Game.ResourcesData.Mass:F2}";
     }
 
-    private void OpenGuideUI(GameState gameState)
+    private void CheckGameOver()
+    {
+        _isGameOver = _gameOverTimer <= 0f;
+        if (_isGameOver)
+            OpenGuideUI(GameState.GAMEOVER);
+    }
+
+    public void OpenGuideUI(GameState gameState)
     {
         GameInputController.Instance.SetInputMode(InputMode.UI);
         Time.timeScale = 0f;
@@ -219,6 +263,9 @@ public class PunkScene : MonoBehaviour
 
     private void OnGuideUIButtonClicked()
     {
-        CloseGuideUI();
+        if (_isGameOver)
+            Managers.Game.ReloadScene();
+        else
+            CloseGuideUI();
     }
 }
