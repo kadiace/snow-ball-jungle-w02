@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class ResourcesData
 {
-    public int Wood;
-    public int Iron;
     public bool IsActive;
     public float CurrentEnergy;
     public float MaxEnergy;
@@ -45,9 +43,11 @@ public class GameManager
     private ResourcesData _resources;
     private float _elapsedTime;
     private float _secondsPerDay = 60f;
-    public float _consume => _consumes[CurrentDegree];
+    private float _consume => _consumes[CurrentDegree];
 
     public ResourcesData ResourcesData { get { return _resources; } set { _resources = value; } }
+    public List<GameObject> Woods { get; private set; }
+    public List<GameObject> Irons { get; private set; }
     public float ElapsedTime { get { return _elapsedTime; } set { _elapsedTime = value; } }
     public int CurrentDay =>
         Mathf.FloorToInt((float)(_elapsedTime / _secondsPerDay)) + 1;
@@ -73,14 +73,14 @@ public class GameManager
     {
         _resources = new()
         {
-            Wood = 0,
-            Iron = 0,
             IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,
             Scale = 6,
             Mass = 3,
         };
+        Woods = new();
+        Irons = new();
         _elapsedTime = 0f;
     }
 
@@ -88,14 +88,38 @@ public class GameManager
     {
         _resources = new()
         {
-            Wood = 0,
-            Iron = 0,
             IsActive = true,
             CurrentEnergy = 50,
             MaxEnergy = 100,
             Scale = 6,
             Mass = 3
         };
+        Woods = new();
+        Irons = new();
         _elapsedTime = 0f;
+    }
+
+    public void PopWood(int count)
+    {
+        PopObjects(Woods, count);
+    }
+
+    public void PopIron(int count)
+    {
+        PopObjects(Irons, count);
+    }
+
+    private void PopObjects(List<GameObject> objects, int count)
+    {
+        count = Mathf.Min(count, objects.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            GameObject obj = objects[^1];
+            objects.RemoveAt(objects.Count - 1);
+
+            Object.Destroy(obj);
+        }
+
     }
 }

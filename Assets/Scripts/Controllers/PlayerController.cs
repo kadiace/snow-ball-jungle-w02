@@ -29,6 +29,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int _currentJumpCount;
     [SerializeField] private bool _canJump;
 
+    [Header("Resize")]
+    [SerializeField] private float _resizeSpeed = 2f;
+
     private Rigidbody _rb;
     private SphereCollider _collider;
     private PhysicsMaterial _physicsMaterial;
@@ -47,18 +50,11 @@ public class PlayerController : MonoBehaviour
     private bool _hasGroundContact;
     private Vector3 _contactGroundNormal = Vector3.up;
 
-    private Coroutine _sizeChangeCoroutine;
-    private float _massChange;
-    private float _scaleChange;
-    private float _maxScale = 20f;
-
     public bool IsGrounded { get; private set; }
     public float MaxJumpCount => _maxJumpCount;
     public BallStat BallStat => _ballStat;
 
     public string CurrentTag { get; set; }
-    public List<GameObject> Trees { get; private set; }
-    public List<GameObject> Metals { get; private set; }
     public List<FacilityInteractionController> Facilities { get; private set; }
 
     private void Awake()
@@ -86,8 +82,6 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        Trees = new();
-        Metals = new();
         Facilities = new();
     }
 
@@ -101,6 +95,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         CheckGround();
+        Resize();
 
         ProcessJump();
         ApplyMovement();
@@ -215,6 +210,34 @@ public class PlayerController : MonoBehaviour
         }
 
         _hasGroundContact = false;
+    }
+    private void Resize()
+    {
+        int resourceCount = Managers.Game.Woods.Count + Managers.Game.Irons.Count;
+
+        float targetMass = 3f + 0.5f * resourceCount;
+        float targetScale = 6f + resourceCount;
+
+        _rb.mass = targetMass;
+        Managers.Game.ResourcesData.Mass = targetMass;
+
+        float currentScale = transform.localScale.x;
+
+        float nextScale = Mathf.MoveTowards(currentScale, targetScale,
+            _resizeSpeed * Time.fixedDeltaTime);
+
+        float changeScale = nextScale - currentScale;
+
+        transform.localScale = Vector3.one * nextScale;
+        Managers.Game.ResourcesData.Scale = nextScale;
+
+        transform.position += Vector3.up * (0.5f * changeScale);
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Transform child = transform.GetChild(i);
+            child.localScale = Vector3.one / nextScale;
+        }
     }
 
     private void ProcessJump()
@@ -402,55 +425,5 @@ public class PlayerController : MonoBehaviour
     {
         _jumpPanelController.SetCurrentJumps(currentJumpCount);
         _currentJumpCount = currentJumpCount;
-    }
-
-    public void RequestSizeChange()
-    {
-        _massChange += 0.5f;
-        _scaleChange += 1f;
-
-        if (_sizeChangeCoroutine == null)
-            _sizeChangeCoroutine = StartCoroutine(ChangeSize());
-    }
-    private IEnumerator ChangeSize()
-    {
-        float startMass = _rb.mass;
-        float startScale = transform.localScale.x;
-
-        float targetMass = startMass + _massChange;
-        float targetScale = Mathf.Min(startScale + _scaleChange, _maxScale);
-
-        _massChange = 0f;
-        _scaleChange = 0f;
-
-        float time = 0f;
-
-        while (time < 1f)
-        {
-            time += Time.deltaTime;
-            float t = Mathf.Clamp01(time);
-
-            Managers.Game.ResourcesData.Mass = Mathf.Lerp(startMass, targetMass, t);
-            Managers.Game.ResourcesData.Scale = Mathf.Lerp(startScale, targetScale, t);
-            _rb.mass = Managers.Game.ResourcesData.Mass;
-            transform.localScale = Vector3.one * Managers.Game.ResourcesData.Scale;
-
-            Transform childTransform;
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                childTransform = transform.GetChild(i);
-                childTransform.localScale = Vector3.one / Managers.Game.ResourcesData.Scale;
-            }
-
-            yield return null;
-        }
-
-        _rb.mass = targetMass;
-        transform.localScale = Vector3.one * targetScale;
-
-        _sizeChangeCoroutine = null;
-
-        if (_massChange > 0f || _scaleChange > 0f)
-            _sizeChangeCoroutine = StartCoroutine(ChangeSize());
     }
 }

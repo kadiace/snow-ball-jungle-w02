@@ -157,8 +157,8 @@ public class PunkScene : MonoBehaviour
         _nextDayText.text = $"Day {Managers.Game.CurrentDay + 1}";
         _nextDegreeText.text = $"{Managers.Game.NextDegree} °C";
 
-        _woodText.text = $"나무: {Managers.Game.ResourcesData.Wood}";
-        _ironText.text = $"철: {Managers.Game.ResourcesData.Iron}";
+        _woodText.text = $"나무: {Managers.Game.Woods.Count}";
+        _ironText.text = $"철: {Managers.Game.Irons.Count}";
 
         _consumeText.text = $"{Mathf.Abs(Managers.Game.EnergyDelta)}";
         _consumeSignText.text = Managers.Game.EnergyDelta switch

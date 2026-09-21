@@ -4,17 +4,15 @@ public class ResourceController : MonoBehaviour
 {
     void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player") || Managers.Game.ResourcesData.Mass > 10)
+        if (!other.CompareTag("Player"))
             return;
 
         PlayerController player = other.GetComponent<PlayerController>();
 
         if (gameObject.CompareTag("Tree"))
-            Managers.Game.ResourcesData.Wood += 1;
+            Managers.Game.Woods.Add(gameObject);
         if (gameObject.CompareTag("Metal"))
-            Managers.Game.ResourcesData.Iron += 1;
-
-        player.RequestSizeChange();
+            Managers.Game.Irons.Add(gameObject);
 
         transform.SetParent(other.transform);
     }

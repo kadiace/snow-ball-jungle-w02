@@ -65,15 +65,15 @@ public class TowerController : FacilityInteractionController
 
         if (_isActivated)
         {
-            Managers.Game.ResourcesData.Wood -= _actualRepairWoodCost;
-            Managers.Game.ResourcesData.Iron -= _actualRepairIronCost;
+            Managers.Game.PopWood(_actualRepairWoodCost);
+            Managers.Game.PopIron(_actualRepairIronCost);
             Duration = MaxDuration;
             SetUI();
         }
         else
         {
-            Managers.Game.ResourcesData.Wood -= _activateWoodCost;
-            Managers.Game.ResourcesData.Iron -= _activateIronCost;
+            Managers.Game.PopWood(_activateWoodCost);
+            Managers.Game.PopIron(_activateIronCost);
             _isActivated = true;
             Duration = MaxDuration;
             SetUI();
@@ -144,8 +144,8 @@ public class TowerController : FacilityInteractionController
         _wood.text = $"필요한 나무: {woodCost}";
         _iron.text = $"필요한 철: {ironCost}";
 
-        bool hasEnoughWood = Managers.Game.ResourcesData.Wood >= woodCost;
-        bool hasEnoughIron = Managers.Game.ResourcesData.Iron >= ironCost;
+        bool hasEnoughWood = Managers.Game.Woods.Count >= woodCost;
+        bool hasEnoughIron = Managers.Game.Irons.Count >= ironCost;
 
         _wood.color = hasEnoughWood
             ? Color.black
