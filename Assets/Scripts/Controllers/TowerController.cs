@@ -83,6 +83,9 @@ public class TowerController : FacilityInteractionController
         Duration -= _durationDecreasePerDay * (Time.deltaTime / secondsPerHour);
         Duration = Mathf.Clamp(Duration, 0f, MaxDuration);
 
+        if (Duration <= 0f)
+            DeactivateTower();
+
         _lightRenderer.material.SetFloat("_Split", Duration / MaxDuration);
     }
 
