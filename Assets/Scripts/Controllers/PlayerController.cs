@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     static string INTERACT_GUIDE = "{Interact} 를 눌러 상호작용";
+    static string RETURN_GUIDE = "{Return} 를 눌러 빠르게 복귀";
 
     [Header("Ground")]
     [SerializeField] private LayerMask _groundLayer;
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour
     private float _jumpGroundedCheckLockTimer;
     private float _coyoteTimer;
     private GameObject _interactGuide;
+    private GameObject _returnGuide;
 
     private Vector3 _gravityDir = Vector3.down;
     private Vector3 _groundNormal = Vector3.up;
@@ -64,6 +66,9 @@ public class PlayerController : MonoBehaviour
 
         _interactGuide = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/InteractGuide"));
         _interactGuide.SetActive(false);
+
+        _returnGuide = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/ReturnGuide"));
+        _returnGuide.SetActive(false);
 
         _rb = GetComponent<Rigidbody>();
         _rb.useGravity = true;
@@ -87,6 +92,7 @@ public class PlayerController : MonoBehaviour
         ProcessMoveInput();
         ProcessJumpInput();
         ProcessInteractInput();
+        ProcessReturnInput();
     }
 
     private void FixedUpdate()
@@ -128,13 +134,41 @@ public class PlayerController : MonoBehaviour
         }
         _interactGuide.SetActive(true);
         Text text = _interactGuide.transform.Find("Panel/Guide").GetComponent<Text>();
-        string interact = Util.GetBindingName("Interact");
-        string message = INTERACT_GUIDE.Replace("{Interact}", interact);
+        string bindingName = Util.GetBindingName("Interact");
+        string message = INTERACT_GUIDE.Replace("{Interact}", bindingName);
         text.text = message;
 
         if (!GameInputController.Instance.InteractPressed)
             return;
 
+        FacilityInteractionController nearestFacility = NearestFacility();
+        if (nearestFacility == null)
+            return;
+
+        nearestFacility.OpenCanvas();
+    }
+
+    private void ProcessReturnInput()
+    {
+        FacilityInteractionController nearestFacility = NearestFacility();
+        if (nearestFacility == null || !Managers.Game.Researches.Contains(ResearchType.TowerWire) || nearestFacility is not TowerController tower || !tower.IsActivated)
+            return;
+
+        _returnGuide.SetActive(true);
+
+        Text text = _returnGuide.transform.Find("Panel/Guide").GetComponent<Text>();
+        string bindingName = Util.GetBindingName("Return");
+        string message = RETURN_GUIDE.Replace("{Return}", bindingName);
+        text.text = message;
+
+        if (!GameInputController.Instance.ReturnPressed)
+            return;
+
+        tower.Return(this);
+    }
+
+    private FacilityInteractionController NearestFacility()
+    {
         float minDistance = float.MaxValue;
         FacilityInteractionController nearestFacility = null;
         Facilities.ForEach(facility =>
@@ -146,11 +180,7 @@ public class PlayerController : MonoBehaviour
                 nearestFacility = facility;
             }
         });
-
-        if (nearestFacility == null)
-            return;
-
-        nearestFacility.OpenCanvas();
+        return nearestFacility;
     }
 
     private void ApplyCurrentSizeStat()
@@ -323,7 +353,7 @@ public class PlayerController : MonoBehaviour
             return;
 
         float moveSpeed = Managers.Game.Researches.Contains(ResearchType.MoveFast) ?
-             _ballStat.MoveSpeed * 2 : _ballStat.MoveSpeed;
+             _ballStat.MoveSpeed * 1.5f : _ballStat.MoveSpeed;
         float moveResponseTime = _ballStat.MoveResponseTime;
 
         Vector3 targetVelocity = groundMoveDirection * moveSpeed * inputMagnitude;
@@ -346,7 +376,7 @@ public class PlayerController : MonoBehaviour
             return;
 
         float moveSpeed = Managers.Game.Researches.Contains(ResearchType.MoveFast) ?
-             _ballStat.MoveSpeed * 2 : _ballStat.MoveSpeed;
+             _ballStat.MoveSpeed * 1.5f : _ballStat.MoveSpeed;
         float moveAcceleration = _ballStat.MoveAcceleration;
 
         Vector3 moveDirection = worldMoveInput.normalized;

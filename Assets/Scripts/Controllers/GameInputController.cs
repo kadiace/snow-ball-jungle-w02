@@ -21,6 +21,7 @@ public class GameInputController : MonoBehaviour
     public bool JumpPressed { get; private set; }
     public bool JumpHeld { get; private set; }
     public bool InteractPressed { get; private set; }
+    public bool ReturnPressed { get; private set; }
     public bool GamePadConnected { get; private set; }
     private void Awake()
     {
@@ -68,6 +69,7 @@ public class GameInputController : MonoBehaviour
         JumpPressed = inputActions.Player.Jump.WasPressedThisFrame();
         JumpHeld = inputActions.Player.Jump.IsPressed();
         InteractPressed = inputActions.Player.Interact.WasPressedThisFrame();
+        ReturnPressed = inputActions.Player.Return.WasPerformedThisFrame();
     }
 
     public void SetInputMode(InputMode mode)

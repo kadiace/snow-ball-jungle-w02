@@ -27,7 +27,7 @@ public class TerrainResourceSpawner : MonoBehaviour
 
     private void Start()
     {
-
+        SpawnResources();
         StartCoroutine(RefillResourcesRoutine());
     }
 

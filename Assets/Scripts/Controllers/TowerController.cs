@@ -1,4 +1,5 @@
 
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -22,7 +23,6 @@ public class TowerController : FacilityInteractionController
     private InputAction _confirmAction;
     private InputAction _cancelAction;
 
-    private bool _isActivated;
     private int _actualRepairWoodCost;
     private int _actualRepairIronCost;
 
@@ -53,6 +53,8 @@ public class TowerController : FacilityInteractionController
 
     public float Duration { get; set; }
     public float MaxDuration { get; set; }
+
+    public bool IsActivated { get; set; }
 
     protected override void Awake()
     {
@@ -133,7 +135,7 @@ public class TowerController : FacilityInteractionController
     private void OnButtonClicked()
     {
 
-        if (_isActivated)
+        if (IsActivated)
         {
             Managers.Game.PopWood(_actualRepairWoodCost);
             Managers.Game.PopIron(_actualRepairIronCost);
@@ -149,7 +151,7 @@ public class TowerController : FacilityInteractionController
             }
             Managers.Game.PopWood(_activateWoodCost);
             Managers.Game.PopIron(_activateIronCost);
-            _isActivated = true;
+            IsActivated = true;
             Duration = MaxDuration;
             Managers.Game.ActivatedTowers.Add(this);
             _lightRenderer.material.SetFloat("_Split", Duration / MaxDuration);
@@ -200,7 +202,7 @@ public class TowerController : FacilityInteractionController
         int woodCost;
         int ironCost;
 
-        if (_isActivated)
+        if (IsActivated)
         {
             _durationPanel.SetActive(true);
 
@@ -238,8 +240,18 @@ public class TowerController : FacilityInteractionController
 
     private void DeactivateTower()
     {
-        _isActivated = false;
+        IsActivated = false;
         Managers.Game.ActivatedTowers.Remove(this);
         _line.material = _lightOffMaterial;
+    }
+
+    public void Return(PlayerController player)
+    {
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        rb.isKinematic = true;
+        player.enabled = false;
+
+        LinePathFollower linePathFollower = player.AddComponent<LinePathFollower>();
+        linePathFollower.LineRenderer = _line;
     }
 }
