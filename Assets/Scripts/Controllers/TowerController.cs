@@ -118,7 +118,10 @@ public class TowerController : FacilityInteractionController
     {
         float secondsPerHour = Managers.Game.SecondsPerDay / 24f;
 
-        Duration -= _durationDecreasePerHour * (Time.deltaTime / secondsPerHour);
+        float durationDecreasePerHour = Managers.Game.Researches.Contains(ResearchType.TowerEfficiency) ?
+                _durationDecreasePerHour / 2 : _durationDecreasePerHour;
+
+        Duration -= durationDecreasePerHour * (Time.deltaTime / secondsPerHour);
         Duration = Mathf.Clamp(Duration, 0f, MaxDuration);
 
         if (Duration <= 0f)

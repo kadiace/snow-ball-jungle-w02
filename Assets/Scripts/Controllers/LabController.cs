@@ -22,6 +22,8 @@ public class LabController : FacilityInteractionController
     private Button _confirm;
     private Dictionary<ResearchType, Button> _buttons = new();
 
+    private GameObject _panel;
+
     [SerializeField] private Renderer[] _lightRenderers;
 
     protected override void Awake()
@@ -58,12 +60,17 @@ public class LabController : FacilityInteractionController
         _lightOffMaterial = Resources.Load<Material>("Materials/LightOff");
 
         EventSystem.current.SetSelectedGameObject(_buttons.Values.First().gameObject);
+
+        _panel = transform.Find("Panel").gameObject;
     }
 
     void Update()
     {
         foreach (var renderer in _lightRenderers)
             renderer.sharedMaterial = Managers.Game.ResourcesData.CurrentEnergy > 0 ? _lightOnMaterial : _lightOffMaterial;
+
+        if (!_panel.activeSelf && Managers.Game.Researches.Contains(ResearchType.SelfGenerate))
+            _panel.SetActive(true);
     }
 
     void OnDestroy()
@@ -106,6 +113,9 @@ public class LabController : FacilityInteractionController
         (int woodCost, int ironCost) = Managers.Game.RearchCosts[_currentSelectedResearchType];
         Managers.Game.PopWood(woodCost);
         Managers.Game.PopIron(ironCost);
+
+        if (_currentSelectedResearchType == ResearchType.BatteryMax && !Managers.Game.Researches.Contains(ResearchType.BatteryMax))
+            Managers.Game.ResourcesData.MaxEnergy *= 2;
 
         Managers.Game.Researches.Add(_currentSelectedResearchType);
 

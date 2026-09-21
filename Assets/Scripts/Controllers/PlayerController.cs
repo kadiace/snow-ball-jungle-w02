@@ -322,7 +322,8 @@ public class PlayerController : MonoBehaviour
         if (inputMagnitude <= 0.001f)
             return;
 
-        float moveSpeed = _ballStat.MoveSpeed;
+        float moveSpeed = Managers.Game.Researches.Contains(ResearchType.MoveFast) ?
+             _ballStat.MoveSpeed * 2 : _ballStat.MoveSpeed;
         float moveResponseTime = _ballStat.MoveResponseTime;
 
         Vector3 targetVelocity = groundMoveDirection * moveSpeed * inputMagnitude;
@@ -344,7 +345,8 @@ public class PlayerController : MonoBehaviour
         if (inputMagnitude <= 0.001f)
             return;
 
-        float moveSpeed = _ballStat.MoveSpeed;
+        float moveSpeed = Managers.Game.Researches.Contains(ResearchType.MoveFast) ?
+             _ballStat.MoveSpeed * 2 : _ballStat.MoveSpeed;
         float moveAcceleration = _ballStat.MoveAcceleration;
 
         Vector3 moveDirection = worldMoveInput.normalized;

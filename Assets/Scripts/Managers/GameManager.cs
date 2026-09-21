@@ -96,7 +96,19 @@ public class GameManager
     private ResourcesData _resources;
     private float _elapsedTime;
     private float _labConsume => _labConsumes[CurrentDegree];
-    private float _energyGain => Wheels.Count * 10 + ActivatedTowers.Count * 5;
+    private float _energyGain
+    {
+        get
+        {
+            float wheelPower = Managers.Game.Researches.Contains(ResearchType.WheelPower) ?
+                Managers.Game.Researches.Contains(ResearchType.WheelPower2) ? 15 : 10 : 5;
+            float baseGain = Wheels.Count * wheelPower + ActivatedTowers.Count * 5;
+            float researchGain = Managers.Game.Researches.Contains(ResearchType.SelfGenerate) ?
+                Managers.Game.Researches.Contains(ResearchType.SelfGenerate2) ? 10 : 5 : 0;
+
+            return baseGain + researchGain;
+        }
+    }
 
     public List<TowerController> Towers { get; private set; }
 
