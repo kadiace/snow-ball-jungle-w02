@@ -19,6 +19,9 @@ public class PlayerCameraController : MonoBehaviour
     {
         _player = GameObject.Find("Player").transform;
         _playerController = _player.gameObject.GetComponent<PlayerController>();
+
+        _yaw = -130f;
+        _pitch = -20f;
     }
 
     private void Update()
