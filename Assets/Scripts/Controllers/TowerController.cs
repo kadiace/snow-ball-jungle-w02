@@ -26,6 +26,10 @@ public class TowerController : FacilityInteractionController
     private int _actualRepairWoodCost;
     private int _actualRepairIronCost;
 
+    private Renderer _lightRenderer;
+    private Material _lightOnMaterial;
+    private Material _lightOffMaterial;
+
     [Header("Activate")]
     [SerializeField] private int _activateWoodCost;
     [SerializeField] private int _activateIronCost;
@@ -58,6 +62,11 @@ public class TowerController : FacilityInteractionController
         _cancelAction.performed += OnCancelPerformed;
 
         MaxDuration = 100;
+
+        Transform light = transform.Find("Light");
+        _lightRenderer = light.GetComponent<Renderer>();
+        _lightOnMaterial = Resources.Load<Material>("Materials/LightOn");
+        _lightOffMaterial = Resources.Load<Material>("Materials/LightOff");
     }
 
     private void OnButtonClicked()
@@ -76,6 +85,7 @@ public class TowerController : FacilityInteractionController
             Managers.Game.PopIron(_activateIronCost);
             _isActivated = true;
             Duration = MaxDuration;
+            _lightRenderer.sharedMaterial = _lightOnMaterial;
             SetUI();
         }
     }
@@ -161,5 +171,6 @@ public class TowerController : FacilityInteractionController
     public void DeactivateTower()
     {
         _isActivated = false;
+        _lightRenderer.sharedMaterial = _lightOffMaterial;
     }
 }
