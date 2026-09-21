@@ -68,6 +68,9 @@ public class PunkScene : MonoBehaviour
     private float _gameOverTimer;
     private bool _isGameOver;
 
+    static private bool _hasTemperature;
+    static private bool _hasDanger;
+
     private GameObject _guideUI;
     private GameObject _gameUI;
     private Image _activePanel;
@@ -109,8 +112,11 @@ public class PunkScene : MonoBehaviour
 
         InitGameUI();
         _initialRotation = _directionalLight.transform.rotation;
+    }
 
-        OpenGuideUI(GameState.INITIAL);
+    void Start()
+    {
+        Managers.Game.OpenGuideUI(GameState.INITIAL);
     }
 
     void Update()
@@ -168,6 +174,11 @@ public class PunkScene : MonoBehaviour
 
     private void SetGameUI()
     {
+        if (Managers.Game.CurrentDegree == -20f && !_hasTemperature)
+        {
+            _hasTemperature = true;
+            Managers.Game.OpenGuideUI(GameState.TEMPERATURE);
+        }
         _currentDayText.text = $"Day {Managers.Game.CurrentDay}";
         _currentDegreeText.text = $"{Managers.Game.CurrentDegree} °C";
 
@@ -182,6 +193,11 @@ public class PunkScene : MonoBehaviour
         }
         else
         {
+            if (!_hasDanger)
+            {
+                _hasDanger = true;
+                Managers.Game.OpenGuideUI(GameState.DANGER);
+            }
             _activePanel.color = COLOR_OFF;
             _activeText.text = "OFF";
             _energyText.text = "정지: ";
@@ -218,7 +234,7 @@ public class PunkScene : MonoBehaviour
     {
         _isGameOver = _gameOverTimer <= 0f;
         if (_isGameOver)
-            OpenGuideUI(GameState.GAMEOVER);
+            Managers.Game.OpenGuideUI(GameState.GAMEOVER);
     }
 
     public void OpenGuideUI(GameState gameState)
@@ -232,14 +248,20 @@ public class PunkScene : MonoBehaviour
         text.text = _guideTexts[gameState];
 
         _guideUI.SetActive(true);
+        Managers.UI.ActiveCanvases.Add(_guideUI);
     }
 
     private void CloseGuideUI()
     {
-        GameInputController.Instance.SetInputMode(InputMode.Player);
-        Time.timeScale = 1f;
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        Managers.UI.ActiveCanvases.Remove(_guideUI);
+
+        if (Managers.UI.ActiveCanvases.Count <= 0)
+        {
+            GameInputController.Instance.SetInputMode(InputMode.Player);
+            Time.timeScale = 1f;
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
 
         _guideUI.SetActive(false);
     }

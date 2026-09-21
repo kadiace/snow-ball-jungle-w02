@@ -14,7 +14,10 @@ public class Managers : MonoBehaviour
     }
 
     private readonly GameManager _gameManager = new();
+    private readonly UIManager _uiManager = new();
+
     public static GameManager Game => Instance._gameManager;
+    public static UIManager UI => Instance._uiManager;
 
     public static void EnsureExists()
     {
@@ -50,11 +53,13 @@ public class Managers : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
         Game.Init();
+        UI.Init();
     }
 
     public static void Clear()
     {
         Game.Clear();
+        UI.Clear();
 
         GameObject go = GameObject.Find("@App");
         Destroy(go);

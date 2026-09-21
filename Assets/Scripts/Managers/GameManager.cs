@@ -14,9 +14,9 @@ public class GameManager
 {
     private readonly Dictionary<int, int> _temperatures = new()
     {
-        {1, -10},
-        {2, -10},
-        {3, -10},
+        {1, 0},
+        {2, -2},
+        {3, -5},
         {4, -20},
         {5, -10},
         {6, -20},
@@ -34,6 +34,9 @@ public class GameManager
 
     private readonly Dictionary<int, int> _labConsumes = new()
     {
+        {0, -5},
+        {-2, -5},
+        {-5, -5},
         {-10, -5},
         {-20, -10},
         {-30, -15},
@@ -80,8 +83,8 @@ public class GameManager
     {
         _resources = new()
         {
-            CurrentEnergy = 50,
-            MaxEnergy = 100,
+            CurrentEnergy = 100,
+            MaxEnergy = 200,
             Scale = 6,
             Mass = 3,
         };

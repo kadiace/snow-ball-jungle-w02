@@ -26,6 +26,8 @@ public class TowerController : FacilityInteractionController
     private int _actualRepairWoodCost;
     private int _actualRepairIronCost;
 
+    static private bool _hasTower;
+
     private Renderer _lightRenderer;
 
     [Header("Activate")]
@@ -37,7 +39,7 @@ public class TowerController : FacilityInteractionController
     [SerializeField] private int _repairIronCost;
 
     [Header("Duration")]
-    [SerializeField] private float _durationDecreasePerDay = 5f;
+    [SerializeField] private float _durationDecreasePerHour = 3f;
 
     public float Duration { get; set; }
     public float MaxDuration { get; set; }
@@ -80,7 +82,7 @@ public class TowerController : FacilityInteractionController
     {
         float secondsPerHour = Managers.Game.SecondsPerDay / 24f;
 
-        Duration -= _durationDecreasePerDay * (Time.deltaTime / secondsPerHour);
+        Duration -= _durationDecreasePerHour * (Time.deltaTime / secondsPerHour);
         Duration = Mathf.Clamp(Duration, 0f, MaxDuration);
 
         if (Duration <= 0f)
@@ -101,6 +103,11 @@ public class TowerController : FacilityInteractionController
         }
         else
         {
+            if (!_hasTower)
+            {
+                Managers.Game.OpenGuideUI(GameState.TOWER);
+                _hasTower = true;
+            }
             Managers.Game.PopWood(_activateWoodCost);
             Managers.Game.PopIron(_activateIronCost);
             _isActivated = true;
