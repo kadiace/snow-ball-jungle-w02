@@ -29,6 +29,11 @@ public class TowerController : FacilityInteractionController
     static private bool _hasTower;
 
     private Renderer _lightRenderer;
+    private Material _lightOnMaterial;
+    private Material _lightOffMaterial;
+    private LineRenderer _line;
+    private Vector3 _startPoint;
+    private Vector3 _endPoint = Vector3.up * 200;
 
     [Header("Activate")]
     [SerializeField] private int _activateWoodCost;
@@ -40,6 +45,11 @@ public class TowerController : FacilityInteractionController
 
     [Header("Duration")]
     [SerializeField] private float _durationDecreasePerHour = 3f;
+
+    [Header("Line")]
+    [SerializeField] private float _sagAmount = 2f;
+    [SerializeField] private int _segments = 30;
+    [SerializeField] private float _width = 0.1f;
 
     public float Duration { get; set; }
     public float MaxDuration { get; set; }
@@ -70,6 +80,31 @@ public class TowerController : FacilityInteractionController
 
         Transform light = transform.Find("Light");
         _lightRenderer = light.GetComponent<Renderer>();
+
+        _lightOnMaterial = Resources.Load<Material>("Materials/LightOn");
+        _lightOffMaterial = Resources.Load<Material>("Materials/LightOff");
+        _line = GetComponent<LineRenderer>();
+
+        _startPoint = transform.position + Vector3.up * 100;
+    }
+    private void Start()
+    {
+        _line.useWorldSpace = true;
+        _line.material = _lightOffMaterial;
+        _line.startWidth = _width;
+        _line.endWidth = _width;
+
+        int count = Mathf.Max(2, _segments);
+        _line.positionCount = count + 1;
+
+        for (int i = 0; i <= count; i++)
+        {
+            float t = i / (float)count;
+            Vector3 point = Vector3.Lerp(_startPoint, _endPoint, t);
+            float sag = 4f * _sagAmount * t * (1f - t);
+            point += Vector3.down * sag;
+            _line.SetPosition(i, point);
+        }
     }
 
     private void OnDestroy()
@@ -114,6 +149,7 @@ public class TowerController : FacilityInteractionController
             Duration = MaxDuration;
             Managers.Game.ActivatedTowers.Add(this);
             _lightRenderer.material.SetFloat("_Split", Duration / MaxDuration);
+            _line.material = _lightOnMaterial;
             SetUI();
         }
     }
@@ -200,5 +236,6 @@ public class TowerController : FacilityInteractionController
     {
         _isActivated = false;
         Managers.Game.ActivatedTowers.Remove(this);
+        _line.material = _lightOffMaterial;
     }
 }

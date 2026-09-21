@@ -1,7 +1,13 @@
+
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TerrainResourceSpawner : MonoBehaviour
 {
+    [Header("Terrains")]
+    [SerializeField] private List<Terrain> _terrains = new();
+
     [Header("Prefabs")]
     [SerializeField] private GameObject _treePrefab;
     [SerializeField] private GameObject _metalPrefab;
@@ -16,43 +22,112 @@ public class TerrainResourceSpawner : MonoBehaviour
     [Header("Random")]
     [SerializeField] private bool _randomRotation = true;
 
+    private const string TreesName = "Trees";
+    private const string MetalsName = "Metals";
+
+    private void Start()
+    {
+
+        StartCoroutine(RefillResourcesRoutine());
+    }
+
+    private IEnumerator RefillResourcesRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(5f);
+
+            RefillResources();
+        }
+    }
+
     [ContextMenu("Spawn Resources")]
     public void SpawnResources()
     {
-        Terrain[] terrains = GetComponentsInChildren<Terrain>();
+        foreach (Terrain terrain in _terrains)
+        {
+            if (terrain == null)
+                continue;
 
-        Transform treesParent = GetOrCreateParent("Trees");
-        Transform metalsParent = GetOrCreateParent("Metals");
+            SpawnOnTerrain(terrain);
+        }
+    }
+    private void RefillResources()
+    {
+        foreach (Terrain terrain in _terrains)
+        {
+            if (terrain == null)
+                continue;
+
+            RefillResource(
+                terrain,
+                TreesName,
+                _treePrefab,
+                _treeCount);
+
+            RefillResource(
+                terrain,
+                MetalsName,
+                _metalPrefab,
+                _metalCount);
+        }
+    }
+
+    private void RefillResource(
+        Terrain terrain,
+        string parentName,
+        GameObject prefab,
+        int targetCount)
+    {
+        Transform parent = GetOrCreateParent(
+            terrain,
+            parentName);
+
+        int currentCount = parent.childCount;
+
+        int spawnCount = targetCount - currentCount;
+
+        if (spawnCount <= 0)
+            return;
+
+        SpawnResourcesOfType(
+            terrain,
+            prefab,
+            1,
+            parent);
+    }
+
+    private void SpawnOnTerrain(Terrain terrain)
+    {
+        Transform treesParent = GetOrCreateParent(
+            terrain,
+            TreesName);
+
+        Transform metalsParent = GetOrCreateParent(terrain, MetalsName);
 
         ClearChildren(treesParent);
         ClearChildren(metalsParent);
 
-        foreach (Terrain terrain in terrains)
-        {
-            SpawnOnTerrain(
-                terrain,
-                _treePrefab,
-                _treeCount,
-                treesParent);
+        SpawnResourcesOfType(terrain, _treePrefab, _treeCount, treesParent);
 
-            SpawnOnTerrain(
-                terrain,
-                _metalPrefab,
-                _metalCount,
-                metalsParent);
-        }
+        SpawnResourcesOfType(terrain, _metalPrefab, _metalCount, metalsParent);
     }
 
-    private Transform GetOrCreateParent(string objectName)
+    private Transform GetOrCreateParent(
+        Terrain terrain,
+        string objectName)
     {
-        GameObject parent = GameObject.Find(objectName);
+        Transform parent = terrain.transform.Find(objectName);
 
         if (parent == null)
         {
-            parent = new GameObject(objectName);
+            GameObject go = new GameObject(objectName);
+            go.transform.SetParent(terrain.transform, false);
+
+            parent = go.transform;
         }
 
-        return parent.transform;
+        return parent;
     }
 
     private void ClearChildren(Transform parent)
@@ -72,7 +147,7 @@ public class TerrainResourceSpawner : MonoBehaviour
         }
     }
 
-    private void SpawnOnTerrain(
+    private void SpawnResourcesOfType(
         Terrain terrain,
         GameObject prefab,
         int count,
@@ -103,9 +178,9 @@ public class TerrainResourceSpawner : MonoBehaviour
 
             spawnPosition.y += _heightOffset;
 
-#if UNITY_EDITOR
             GameObject instance;
 
+#if UNITY_EDITOR
             if (!Application.isPlaying)
             {
                 instance = (GameObject)UnityEditor.PrefabUtility
@@ -116,7 +191,7 @@ public class TerrainResourceSpawner : MonoBehaviour
                 instance = Instantiate(prefab, parent);
             }
 #else
-            GameObject instance = Instantiate(prefab, parent);
+            instance = Instantiate(prefab, parent);
 #endif
 
             instance.transform.position = spawnPosition;

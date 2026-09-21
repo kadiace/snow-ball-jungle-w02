@@ -2,6 +2,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+public enum ResearchType
+{
+    SelfGenerate,
+    SelfGenerate2,
+    TowerMax,
+    TowerEfficiency,
+    TowerWire,
+    MoveFast,
+
+}
+
 public class ResourcesData
 {
     public float CurrentEnergy;
@@ -45,7 +56,6 @@ public class GameManager
 
     private ResourcesData _resources;
     private float _elapsedTime;
-    private float _secondsPerDay = 60f;
     private float _labConsume => _labConsumes[CurrentDegree];
     private float _energyGain => Wheels.Count * 10 + ActivatedTowers.Count * 5;
 
@@ -60,10 +70,10 @@ public class GameManager
     public readonly float SecondsPerDay = 60;
     public float ElapsedTime { get { return _elapsedTime; } set { _elapsedTime = value; } }
     public int CurrentDay =>
-        Mathf.FloorToInt((float)(_elapsedTime / _secondsPerDay)) + 1;
+        Mathf.FloorToInt((float)(_elapsedTime / SecondsPerDay)) + 1;
     public int CurrentDegree => _temperatures[CurrentDay];
     public int NextDegree => _temperatures[CurrentDay + 1];
-    public float ElapsedInDayProgress => _elapsedTime % _secondsPerDay / _secondsPerDay;
+    public float ElapsedInDayProgress => _elapsedTime % SecondsPerDay / SecondsPerDay;
     public string CurrentTime
     {
         get
