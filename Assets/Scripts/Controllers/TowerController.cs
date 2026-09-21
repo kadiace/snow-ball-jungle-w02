@@ -27,8 +27,6 @@ public class TowerController : FacilityInteractionController
     private int _actualRepairIronCost;
 
     private Renderer _lightRenderer;
-    private Material _lightOnMaterial;
-    private Material _lightOffMaterial;
 
     [Header("Activate")]
     [SerializeField] private int _activateWoodCost;
@@ -37,6 +35,9 @@ public class TowerController : FacilityInteractionController
     [Header("Repair")]
     [SerializeField] private int _repairWoodCost;
     [SerializeField] private int _repairIronCost;
+
+    [Header("Duration")]
+    [SerializeField] private float _durationDecreasePerDay = 5f;
 
     public float Duration { get; set; }
     public float MaxDuration { get; set; }
@@ -67,14 +68,22 @@ public class TowerController : FacilityInteractionController
 
         Transform light = transform.Find("Light");
         _lightRenderer = light.GetComponent<Renderer>();
-        _lightOnMaterial = Resources.Load<Material>("Materials/LightOn");
-        _lightOffMaterial = Resources.Load<Material>("Materials/LightOff");
     }
 
     private void OnDestroy()
     {
         _confirmAction.performed -= OnConfirmPerformed;
         _cancelAction.performed -= OnCancelPerformed;
+    }
+
+    void Update()
+    {
+        float secondsPerHour = Managers.Game.SecondsPerDay / 24f;
+
+        Duration -= _durationDecreasePerDay * (Time.deltaTime / secondsPerHour);
+        Duration = Mathf.Clamp(Duration, 0f, MaxDuration);
+
+        _lightRenderer.material.SetFloat("_Split", Duration / MaxDuration);
     }
 
     private void OnButtonClicked()
@@ -94,7 +103,7 @@ public class TowerController : FacilityInteractionController
             _isActivated = true;
             Duration = MaxDuration;
             Managers.Game.ActivatedTowers.Add(this);
-            _lightRenderer.sharedMaterial = _lightOnMaterial;
+            _lightRenderer.material.SetFloat("_Split", Duration / MaxDuration);
             SetUI();
         }
     }
@@ -177,10 +186,9 @@ public class TowerController : FacilityInteractionController
         _confirm.interactable = hasEnoughWood && hasEnoughIron;
     }
 
-    public void DeactivateTower()
+    private void DeactivateTower()
     {
         _isActivated = false;
-        _lightRenderer.sharedMaterial = _lightOffMaterial;
         Managers.Game.ActivatedTowers.Remove(this);
     }
 }

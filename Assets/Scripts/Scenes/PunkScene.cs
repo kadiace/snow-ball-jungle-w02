@@ -63,7 +63,6 @@ public class PunkScene : MonoBehaviour
 
     [SerializeField] private GameObject _directionalLight;
     [SerializeField] private GameObject _lab;
-    [SerializeField] private float _secondsPerDay = 60f;
     [SerializeField] private float _gameOverTime = 30f;
 
     private float _gameOverTimer;
@@ -161,7 +160,7 @@ public class PunkScene : MonoBehaviour
 
     private void ApplyEnergyDelta()
     {
-        float secondsPerHour = _secondsPerDay / 24f;
+        float secondsPerHour = Managers.Game.SecondsPerDay / 24f;
 
         Managers.Game.ResourcesData.CurrentEnergy += Managers.Game.EnergyDelta * (Time.deltaTime / secondsPerHour);
         Managers.Game.ResourcesData.CurrentEnergy = Mathf.Clamp(Managers.Game.ResourcesData.CurrentEnergy, 0f, Managers.Game.ResourcesData.MaxEnergy);

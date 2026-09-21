@@ -53,6 +53,8 @@ public class GameManager
     public List<GameObject> Irons { get; private set; }
     public List<Wheel> Wheels { get; private set; }
     public List<TowerController> ActivatedTowers { get; private set; }
+
+    public readonly float SecondsPerDay = 60;
     public float ElapsedTime { get { return _elapsedTime; } set { _elapsedTime = value; } }
     public int CurrentDay =>
         Mathf.FloorToInt((float)(_elapsedTime / _secondsPerDay)) + 1;
@@ -93,19 +95,7 @@ public class GameManager
 
     public void Clear()
     {
-        _resources = new()
-        {
-            CurrentEnergy = 50,
-            MaxEnergy = 100,
-            Scale = 6,
-            Mass = 3
-        };
-        Woods = new();
-        Irons = new();
-        Wheels = new();
-        Towers = new();
-        ActivatedTowers = new();
-        _elapsedTime = 0f;
+
     }
 
     public void PopWood(int count)
