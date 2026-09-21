@@ -78,12 +78,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\uC798 \uD558\uC168\uC2B5\uB2C8\uB2E4!\n\uC774\uC81C\uBD80\uD130 {Jump}\uD0A4\uB97C
-    \uB20C\uB7EC \uC810\uD504\uAC00 \uAC00\uB2A5\uD569\uB2C8\uB2E4.\n\uAD6C\uC2AC\uC744
-    \uBAA8\uC544 \uD798\uC744 \uD68C\uBCF5\uD55C \uB4A4 \uC131\uC9C0\uB85C \uB3CC\uC544\uAC00\uC138\uC694.\n\n\uC810\uD504:
-    {Jump} \uAC15\uD558: {Dive} \uD06C\uAE30 \uC870\uC808: {Resize}\n\uC5B8\uC81C\uB4E0\uC9C0
-    \uC774 \uAD6C\uC2AC\uB85C \uB2E4\uC2DC \uB3CC\uC544\uC640 \uC0AC\uC6A9\uBC95\uC744
-    \uD655\uC778\uD558\uC2E4 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
+  m_Text: "\uC804\uB825\uC744 \uBAA8\uB450 \uC18C\uBAA8\uD588\uC2B5\uB2C8\uB2E4.\r\n   
+    30\uCD08 \uC548\uC73C\uB85C \uC804\uB825 \uACF5\uAE09\uC6D0\uC744 \uCC3E\uC9C0
+    \uBABB\uD558\uBA74 \uC885\uC790 \uBCF4\uAD00\uC18C\uC758 \uBCF5\uAD6C\uAC00 \uBD88\uAC00\uB2A5\uD574\uC9D1\uB2C8\uB2E4."
 --- !u!1 &6111779121081666459
 GameObject:
   m_ObjectHideFlags: 0
@@ -173,9 +170,8 @@ GameObject:
   - component: {fileID: 7072042631006815451}
   - component: {fileID: 72962060941722405}
   - component: {fileID: 6442442567820235467}
-  - component: {fileID: 2454697409791783730}
   m_Layer: 5
-  m_Name: PrizeCanvas
+  m_Name: GuideCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -222,7 +218,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 99
   m_TargetDisplay: 0
 --- !u!114 &72962060941722405
 MonoBehaviour:
@@ -264,23 +260,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &2454697409791783730
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6199676943508247232}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e981ecae8e8cfb744891463de117f44b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  _prizePanel: {fileID: 6111779121081666459}
-  _prizeButton: {fileID: 7233003029355868975}
-  _text: {fileID: 7185344025104889915}
-  isGetFirstSave: 1
-  isGetFirstPrize: 1
 --- !u!1 &6304774811240299987
 GameObject:
   m_ObjectHideFlags: 0

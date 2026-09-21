@@ -1,17 +1,67 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
+public enum GameState
+{
+    INITIAL,
+    TOWER,
+    TEMPERATURE,
+    DANGER,
+    GAMEOVER,
+}
 
 public class PunkScene : MonoBehaviour
 {
     private readonly Color COLOR_ON = new Color32(46, 204, 113, 255);
     private readonly Color COLOR_OFF = new Color32(231, 76, 60, 255);
 
+    static string GUIDE_INITIAL = @"종자 보관소에 전력 공급이 끊겨 복구 프로토콜이 동작했고
+    그 결과 당신이 깨어났습니다.
+    
+    위기가 찾아오기 전까지 다양한 방법으로 전력을 확보하고
+    종자 보관소의 온도 유지 장치가 계속 가동될 수 있도록 전력을 관리해야 합니다.
+    
+    전력은 수급량에 따라 실시간으로 변하며
+    날씨가 추워질수록 온도 유지 장치의 전력 소비량은 늘어납니다.";
+
+    static string GUIDE_TOWER = @"축하합니다! 첫 에너지 중개소 활성화에 성공했습니다.
+    
+    하지만 활성화되었다고 안심할 순 없습니다.
+    에너지 중개소는 추위, 시간에 따라 실시간으로 내구도가 감소하며,
+    내구도가 전부 감소하면 다시 비활성화됩니다.
+    
+    비활성화되기 전에 자원을 이용해 내구도를 수리할 수 있습니다.";
+
+    static string GUIDE_TEMPERATURE = @"기온이 감소했습니다.
+    
+    종자 보관소 온도 유지 장치의 전력 소모량이 증가하고,
+    에너지 중개소의 내구도가 더 빠르게 감소합니다.
+    {} ";
+
+    static string GUIDE_DANGER = @"전력을 모두 소모했습니다.
+    30초 안으로 전력 공급원을 찾지 못하면
+    종자 보관소가 복구할 수 없는 피해를 입습니다.";
+
+    static string GUIDE_GAMEOVER = @"게임 오버!
+    종자 보관소를 지키는데 실패했습니다.
+    다시 시도하시겠습니까?";
+
+    static Dictionary<GameState, string> _guideTexts = new()
+    {
+      {GameState.INITIAL, GUIDE_INITIAL},
+      {GameState.TOWER, GUIDE_TOWER},
+      {GameState.TEMPERATURE, GUIDE_TEMPERATURE},
+      {GameState.DANGER, GUIDE_DANGER},
+      {GameState.GAMEOVER, GUIDE_GAMEOVER},
+    };
+
     [SerializeField] private GameObject _directionalLight;
     [SerializeField] private GameObject _lab;
     [SerializeField] private float _secondsPerDay = 60f;
 
-    private GameObject _prizeUI;
+    private GameObject _guideUI;
     private GameObject _gameUI;
     private Image _activePanel;
     private Text _activeText;
@@ -26,17 +76,29 @@ public class PunkScene : MonoBehaviour
     private Text _nextDegreeText;
     private Text _timeText;
     private Text _sizeText;
+    private InputAction _confirmAction;
+    private InputAction _cancelAction;
 
     private Quaternion _initialRotation;
 
     void Awake()
     {
-        _prizeUI = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/PrizeCanvas"));
-        _prizeUI.SetActive(false);
+        _guideUI = Instantiate(Resources.Load<GameObject>("Prefabs/UIs/GuideCanvas"));
+        _guideUI.SetActive(false);
+
+        var button = _guideUI.GetComponentInChildren<Button>();
+        button.onClick.AddListener(OnGuideUIButtonClicked);
+
+        _confirmAction = InputSystem.actions.FindAction("Confirm");
+        _confirmAction.performed += OnConfirmPerformed;
+
+        _cancelAction = InputSystem.actions.FindAction("Cancel");
+        _cancelAction.performed += OnCancelPerformed;
 
         InitGameUI();
-
         _initialRotation = _directionalLight.transform.rotation;
+
+        OpenGuideUI(GameState.INITIAL);
     }
 
     void Update()
@@ -114,5 +176,43 @@ public class PunkScene : MonoBehaviour
 
         _timeText.text = $"{Managers.Game.CurrentTime}";
         _sizeText.text = $"눈덩이 무게: {Managers.Game.ResourcesData.Mass:F2}";
+    }
+
+    private void OpenGuideUI(GameState gameState)
+    {
+        GameInputController.Instance.SetInputMode(InputMode.UI);
+        Time.timeScale = 0f;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        Text text = _guideUI.GetComponentInChildren<Text>();
+        text.text = _guideTexts[gameState];
+
+        _guideUI.SetActive(true);
+    }
+
+    private void CloseGuideUI()
+    {
+        GameInputController.Instance.SetInputMode(InputMode.Player);
+        Time.timeScale = 1f;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        _guideUI.SetActive(false);
+    }
+
+    private void OnConfirmPerformed(InputAction.CallbackContext context)
+    {
+        OnGuideUIButtonClicked();
+    }
+
+    private void OnCancelPerformed(InputAction.CallbackContext context)
+    {
+        OnGuideUIButtonClicked();
+    }
+
+    private void OnGuideUIButtonClicked()
+    {
+        CloseGuideUI();
     }
 }

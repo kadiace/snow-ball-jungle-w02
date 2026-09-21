@@ -35,4 +35,14 @@ public class FacilityInteractionController : MonoBehaviour
 
         _canvas.SetActive(true);
     }
+
+    private void CloseCanvas()
+    {
+        GameInputController.Instance.SetInputMode(InputMode.Player);
+        Time.timeScale = 1f;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        _canvas.SetActive(false);
+    }
 }
